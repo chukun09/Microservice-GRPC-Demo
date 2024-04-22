@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+option csharp_namespace = "DepartmentMicroservice";
+
+import "Protos/google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+package department;
+
+service Departmenter {
+	rpc AddDepartment (AddDepartmentRequest) returns (DepartmentReply){
+	option (google.api.http) = {
+      post: "/v1/department/add-department",
+	  body: "*"
+    };
+	};
+	rpc UpdateDepartment (DepartmentRequest) returns (DepartmentReply){
+	option (google.api.http) = {
+      put: "/v1/department/add-department",
+	  body: "department"
+    };
+	};
+	rpc DeleteDepartment (DeleteDepartmentRequest) returns (DepartmentReply);
+	// Get all department
+	rpc GetAllDepartment (stream Empty) returns (stream GetAllDepartmentReply){
+	};
+}
+	message DepartmentRequest {
+	Department department = 1;
+}
+
+message AddDepartmentRequest {
+  string name = 1;
+  string description = 2;
+}
+
+message Department {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+}
+
+message DeleteDepartmentRequest{
+	string id = 1;
+}
+
+message DepartmentReply {
+  string message = 1;
+}
+message GetAllDepartmentReply {
+	repeated Department departments = 1;
+}
+
+message Empty {
+
+}

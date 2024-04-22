@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+option csharp_namespace = "EmployeeMicroservice";
+
+import "Protos/google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+package employee;
+
+service Employeer {
+		rpc AddEmployee (AddEmployeeRequest) returns (EmployeeReply){
+	option (google.api.http) = {
+      post: "/v1/employee/add-employee",
+	  body: "*"
+    };
+	};
+	rpc UpdateEmployee (EmployeeRequest) returns (EmployeeReply){
+	option (google.api.http) = {
+      put: "/v1/employee/add-employee",
+	  body: "employee"
+    };
+	};
+	rpc DeleteEmployee (DeleteEmployeeRequest) returns (EmployeeReply);
+	// Get all employee
+	rpc GetAllEmployee (stream Empty) returns (stream GetAllEmployeeReply){
+	};
+}
+	message EmployeeRequest {
+	Employee employee = 1;
+}
+
+message AddEmployeeRequest {
+  string userId = 2;
+  string firstName = 3;
+  string lastName = 4;
+  string address = 5;
+  string departmentId = 6;
+  string position = 7;
+  google.protobuf.Timestamp dateOfBirth = 8;
+}
+
+message Employee {
+  string id = 1;
+  string userId = 2;
+  string firstName = 3;
+  string lastName = 4;
+  string address = 5;
+  string departmentId = 6;
+  string position = 7;
+  google.protobuf.Timestamp dateOfBirth = 8;
+}
+
+message DeleteEmployeeRequest{
+	string id = 1;
+}
+
+message EmployeeReply {
+  string message = 1;
+}
+message GetAllEmployeeReply {
+	repeated Employee employees = 1;
+}
+
+message Empty {
+
+}

@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+option csharp_namespace = "AuthMicroservice.Protos";
+
+import "Protos/google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+package user;
+
+
+service Userer
+{
+	rpc SignIn(SignInRequest) returns (SignInReply);
+	rpc SignUp(SignUpRequest) returns (UserInformation);
+	rpc RefreshToken(RefreshTokenRequest) returns (SignInReply);
+}
+
+message SignInRequest {
+	string userName = 1; 
+	string password = 2;
+}
+
+message SignUpRequest {
+	string userName = 1;
+	string password = 2;
+	string email = 3; 
+	string firstName = 4;
+	string lastName = 5;
+}
+
+message RefreshTokenRequest {
+	string accessToken = 1;
+	string refreshToken = 2;
+}
+
+message SignInReply {
+	string userName = 1;
+	string accessToken = 2;
+	string refreshToken = 3;
+}
+message UserInformation {
+ 	string userName = 1;
+	string email = 2; 
+	string firstName = 3;
+	string lastName = 4;
+}
+
+
+message UserReply {
+  string message = 1;
+}
+message GetAllUserReply {
+	repeated UserInformation attendances = 1;
+}
+
+message Empty {
+
+}
