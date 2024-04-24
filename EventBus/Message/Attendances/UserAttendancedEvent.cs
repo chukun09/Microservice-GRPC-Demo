@@ -14,6 +14,6 @@ namespace EventBus.Message.Attendances
         public string? EmployeeId { get; set; }
         public DateOnly Date { get; set; }
         public DateTime CheckinTime { get; set; }
-        public DateTime CheckoutTime { get; set; }
+        public DateTime? CheckoutTime { get; set; }
     }
 }

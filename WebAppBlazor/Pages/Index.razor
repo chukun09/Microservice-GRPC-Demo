@@ -1,9 +1,60 @@
 ﻿@page "/"
+@attribute [Authorize]
+@using System
+@using System.Threading.Tasks
+<div class="container">
+    <div class="row mt-5">
+        <div class="col-md-8 offset-md-2 text-center">
+            <h1>Welcome to Attendance Management System</h1>
+            <p class="lead">Track your attendance easily with our system.</p>
+            <hr />
 
-<PageTitle>Index</PageTitle>
+            <div class="row">
+                <div class="col-md-6">
+                    <button class="btn btn-success btn-lg btn-block" @onclick="CheckIn">
+                        <i class="fas fa-sign-in-alt mr-2"></i> Check-In
+                    </button>
+                </div>
+                <div class="col-md-6">
+                    <button class="btn btn-danger btn-lg btn-block" @onclick="CheckOut">
+                        <i class="fas fa-sign-out-alt mr-2"></i> Check-Out
+                    </button>
+                </div>
+            </div>
 
-<h1>Hello, world!</h1>
+            <hr />
 
-Welcome to your new app.
+            @if (isCheckedIn)
+            {
+                <div class="alert alert-success" role="alert">
+                    You are currently checked in. Last check-in time: @lastCheckInTime
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-danger" role="alert">
+                    You are currently checked out. Last check-out time: @lastCheckOutTime
+                </div>
+            }
+        </div>
+    </div>
+</div>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+@code {
+    private bool isCheckedIn = false;
+    private DateTime lastCheckInTime;
+    private DateTime lastCheckOutTime;
+
+    private async Task CheckIn()
+    {
+        isCheckedIn = true;
+        lastCheckInTime = DateTime.Now;
+        lastCheckOutTime = DateTime.MinValue; // Reset check-out time
+    }
+
+    private async Task CheckOut()
+    {
+        isCheckedIn = false;
+        lastCheckOutTime = DateTime.Now;
+    }
+}

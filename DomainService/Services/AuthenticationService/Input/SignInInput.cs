@@ -13,6 +13,6 @@ namespace DomainService.AuthenticationService.Input
         public string Username { get; set; }
         [Required]
         public string Password { get; set; }
-        public bool IsRememberMe { get; set; }
+        public bool IsRememberMe { get; set; } = true;
     }
 }

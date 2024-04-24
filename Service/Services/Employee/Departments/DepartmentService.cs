@@ -5,6 +5,7 @@ using DomainService.UnitOfWorks.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -35,6 +36,7 @@ namespace Service.Services.Department.Departments
             {
                 await _unitOfWork.DepartmentRepository.Delete(employee.Id);
                 await _unitOfWork.SaveChangesAsync(ct);
+                return;
             }
             throw new CustomException("Id not match with any information, please check again");
         }
@@ -52,6 +54,11 @@ namespace Service.Services.Department.Departments
 
             // We got 1 or more employees to return
             return new List<DepartmentEntity>(results);
+        }
+
+        public async Task<DepartmentEntity> GetByConditionAsync(Expression<Func<DepartmentEntity, bool>> condition, CancellationToken ct)
+        {
+            return await _unitOfWork.DepartmentRepository.FirstOrDefaultAsync(condition);
         }
 
         public async Task<DepartmentEntity> GetByIdAsync(Guid id, CancellationToken ct)

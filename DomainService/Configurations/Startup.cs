@@ -143,6 +143,7 @@ namespace DomainService.Configurations
             services.AddMassTransit(config =>
             {
                 config.AddConsumer<UserAttendancedConsumer>();
+                config.AddConsumer<UserLoggedInConsumer>();
                 config.UsingRabbitMq((ctx, cfg) =>
                 {
                     cfg.Host(settings.Host, x =>
@@ -154,9 +155,14 @@ namespace DomainService.Configurations
                     {
                         c.ConfigureConsumer<UserAttendancedConsumer>(ctx);
                     });
+                    cfg.ReceiveEndpoint(EventBusConstants.UserLoggedinEvent, c =>
+                    {
+                        c.ConfigureConsumer<UserLoggedInConsumer>(ctx);
+                    });
                 });
             });
             services.AddScoped<UserAttendancedConsumer>();
+            services.AddScoped<UserLoggedInConsumer>();
             return services;
         }
         public static IServiceCollection AddEventBusServiceAuthenticationService(this IServiceCollection services, IConfiguration configuration)

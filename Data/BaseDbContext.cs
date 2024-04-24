@@ -37,7 +37,7 @@ namespace Data
                         e.State == EntityState.Added
                         || e.State == EntityState.Modified
                         || e.State == EntityState.Deleted));
-            var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").LastOrDefault();
+            var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").LastOrDefault() ?? "";
             var userId = "";
             var username = "";
             if (!string.IsNullOrEmpty(token))
@@ -79,7 +79,7 @@ namespace Data
                         e.State == EntityState.Added
                         || e.State == EntityState.Modified
                         || e.State == EntityState.Deleted));
-            var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").LastOrDefault();
+            var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").LastOrDefault() ?? "";
             var userId = "";
             var username = "";
             if (!string.IsNullOrEmpty(token))

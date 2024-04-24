@@ -77,16 +77,16 @@ namespace EmployeeMicroservice.Services
                 foreach (var entity in employees)
                 {
                     //Map request message to object
-                    var reply = new Employee()
+                    var reply = new EmployeeMessage()
                     {
                         Id = entity.Id,
                         FirstName = entity.FirstName,
                         LastName = entity.LastName,
                         UserId = entity.UserId,
-                        Address = entity.Address,
-                        DateOfBirth = Timestamp.FromDateTime(entity.DateOfBirth),
-                        DepartmentId = entity.DepartmentId,
-                        Position = entity.Position,
+                        Address = entity.Address ?? "",
+                        DateOfBirth = entity.DateOfBirth == null ? null : Timestamp.FromDateTime((DateTime)entity.DateOfBirth),
+                        DepartmentId = entity.DepartmentId ?? "",
+                        Position = entity.Position ?? "",
                     };
                     result.Employees.Add(reply);
                 }

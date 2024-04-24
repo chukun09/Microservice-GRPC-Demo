@@ -6,7 +6,6 @@ using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using static Grpc.Core.Metadata;
 
 namespace DepartmentMicroservice.Services
 {
@@ -73,7 +72,7 @@ namespace DepartmentMicroservice.Services
                 foreach (var entity in departments)
                 {
                     //Map request message to object
-                    var reply = new Department()
+                    var reply = new DepartmentMessage()
                     {
                         Id = entity.Id,
                         Name = entity.Name,

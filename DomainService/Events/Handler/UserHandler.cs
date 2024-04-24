@@ -1,6 +1,7 @@
 ﻿using Core.Entites;
 using DomainService.AuthenticationService.Input;
 using DomainService.Commands;
+using DomainService.Events.Notifications;
 using DomainService.Services.AuthenticationService;
 using MediatR;
 using System;
@@ -45,6 +46,7 @@ namespace DomainService.Events.Handler
         public async Task<SignInResult> Handle(SignInCommand request, CancellationToken cancellationToken)
         {
             var result = await _userService.SignInAsync(request.input);
+            await _mediator.Publish(new UserLoggedinNotification(result), cancellationToken);
             return result;
         }
     }
@@ -66,6 +68,23 @@ namespace DomainService.Events.Handler
         {
             var result = await _userService.RefreshTokenAsync(request.input);
             return result;
+        }
+    }
+    /// <summary>
+    /// Signout Handler
+    /// </summary>
+    public class SignOutHandler : IRequestHandler<SignOutCommand>
+    {
+        protected readonly IUserService _userService;
+
+        public SignOutHandler(IUserService userService)
+        {
+            _userService = userService;
+        }
+
+        public async Task Handle(SignOutCommand request, CancellationToken cancellationToken)
+        {
+            await _userService.SignOut();
         }
     }
 }

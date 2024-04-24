@@ -5,6 +5,7 @@ using DomainService.UnitOfWorks.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -35,6 +36,7 @@ namespace Service.Services.Employee.WorkHoursSummary
             {
                 await _unitOfWork.WorkHoursSummaryRepository.Delete(employee.Id);
                 await _unitOfWork.SaveChangesAsync(ct);
+                return;
             }
             throw new CustomException("Id not match with any information, please check again");
         }
@@ -52,6 +54,11 @@ namespace Service.Services.Employee.WorkHoursSummary
 
             // We got 1 or more employees to return
             return new List<WorkHoursSummaryEntity>(results);
+        }
+
+        public async Task<WorkHoursSummaryEntity> GetByConditionAsync(Expression<Func<WorkHoursSummaryEntity, bool>> condition, CancellationToken ct)
+        {
+            return await _unitOfWork.WorkHoursSummaryRepository.FirstOrDefaultAsync(condition);
         }
 
         public async Task<WorkHoursSummaryEntity> GetByIdAsync(Guid id, CancellationToken ct)

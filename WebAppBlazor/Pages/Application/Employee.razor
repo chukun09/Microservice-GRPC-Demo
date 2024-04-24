@@ -1,0 +1,250 @@
+﻿@page "/employee"
+@using Core.Entites
+@using EmployeeMicroservice
+@using WebAppBlazor.Services.Employee
+@using WebAppBlazor.Shared.Components
+@attribute [Authorize]
+@inject IJSRuntime JSRuntime
+@inject IEmployeeService _employeeService;
+@inject SweetAlertService Swal;
+
+<style>
+    .modal {
+        transition: opacity 0.3s ease-in-out;
+    }
+
+        .modal.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+</style>
+<h1>Employee</h1>
+<div class="d-flex justify-content-end m-3">
+    <ul class="list-inline m-0">
+        <li class="list-inline-item">
+            <button class="btn btn-sm btn-info" disabled="@(isMultipleSelected)" type="button" @onclick="openEditModal" data-placement="top" title="Edit">
+                <img src="/images/icon-edit.svg" height="16px" /> Edit
+            </button>
+        </li>
+        <li class="list-inline-item">
+            <button class="btn btn-sm btn-info" type="button" @onclick="Delete" data-placement="top" title="Delete">
+                <img src="/images/icon-delete.svg" height="16px" /> Delete
+            </button>
+        </li>
+    </ul>
+
+</div>
+<MudTable ServerData="@(new Func<TableState, Task<TableData<EmployeeEntity>>>(ServerReload))" T="EmployeeEntity"
+          Hover="true" @ref="table" MultiSelection="true" SelectedItemsChanged="OnSelectedItemsChanged" Comparer="Comparer">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Periodic Employees</MudText>
+        <MudSpacer />
+        <MudTextField T="string" ValueChanged="@(s=>OnSearch(s))" Placeholder="Search" Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>First Name</MudTh>
+        <MudTh>Last Name</MudTh>
+        <MudTh>Position</MudTh>
+        <MudTh>Address</MudTh>
+        <MudTh>Date Of Birth</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="First Name">@context.FirstName</MudTd>
+        <MudTd DataLabel="Last Name">@context.LastName</MudTd>
+        <MudTd DataLabel="Position">@context.Position</MudTd>
+        <MudTd DataLabel="Adress">@context?.Address</MudTd>
+        <MudTd DataLabel="Date Of Birth">@context.DateOfBirth.GetValueOrDefault().ToString("dd-MM-yyyy")</MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText>No matching records found</MudText>
+    </NoRecordsContent>
+    <LoadingContent>
+        <MudText>Loading...</MudText>
+    </LoadingContent>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+@* Modal  *@
+<Modal @ref="modal">
+    <Title>Employee Modal</Title>
+    <Body>
+        <EditForm Model="@modalEmployee" OnValidSubmit="SaveEmployee">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="mb-3">
+                <label for="firstName" class="form-label">First Name</label>
+                <InputText type="text" class="form-control" id="firstName" @bind-Value="modalEmployee.FirstName" placeholder="First Name" />
+            </div>
+            <div class="mb-3">
+                <label for="lastName" class="form-label">Last Name</label>
+                <InputText type="text" class="form-control" id="lastName" @bind-Value="modalEmployee.LastName" placeholder="Last Name" />
+            </div>
+            <div class="mb-3">
+                <label for="address" class="form-label">Address</label>
+                <InputText type="text" class="form-control" id="address" @bind-Value="modalEmployee.Address" placeholder="Address" />
+            </div>
+            <div class="mb-3">
+                <label for="position" class="form-label">Position</label>
+                <InputText class="form-control" id="position" @bind-Value="modalEmployee.Position" />
+            </div>
+        </EditForm>
+    </Body>
+    <Footer>
+        <button type="button" class="btn btn-primary" @onclick="SaveEmployeeEntity">Save changes</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="() => modal.Close()">Close</button>
+    </Footer>
+</Modal>
+@code {
+    private IEnumerable<EmployeeEntity> pagedData;
+    private MudTable<EmployeeEntity> table;
+    private ElementComparer Comparer = new();
+    private int totalItems;
+    private string searchString = null;
+    private EmployeeEntity selectedEmployee;
+    private EmployeeEntity modalEmployee = new EmployeeEntity()
+        {
+            UserId = "",
+            FirstName = "",
+            LastName = ""
+        };
+    private Modal modal { get; set; }
+    private bool isMultipleSelected = false;
+    private void SaveEmployee()
+    {
+        // Implement logic to save the modalEmployee object
+        // For example, you can call a method in a service to save the employee data
+
+        modal.Close(); // Close the modal after saving
+    }
+    private void OnSelectedItemsChanged(HashSet<EmployeeEntity> elements)
+    {
+        if (elements.Count == 1)
+        {
+            isMultipleSelected = false;
+            selectedEmployee = elements.First();
+        }
+        else
+        {
+            selectedEmployee = new EmployeeEntity()
+                {
+                    UserId = "",
+                    FirstName = "",
+                    LastName = ""
+                }; ;
+            isMultipleSelected = true;
+        }
+    }
+    private async Task openCreateModal()
+    {
+        modalEmployee = null;
+        await modal.Open();
+    }
+    private async Task openEditModal()
+    {
+        modalEmployee = selectedEmployee;
+        await modal.Open();
+    }
+    private async Task Delete()
+    {
+        SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Are you sure?",
+                Text = "You will not be able to recover this imaginary file!",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes, delete it!",
+                CancelButtonText = "No, keep it"
+            });
+
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            await _employeeService.DeleteAsync(selectedEmployee.Id);
+            await Swal.FireAsync(
+                "Deleted",
+                "Your imaginary file has been deleted.",
+               SweetAlertIcon.Success
+                );
+            await Task.Delay(300);
+            await table.ReloadServerData();
+        }
+        else if (result.Dismiss == DismissReason.Cancel)
+        {
+            await Swal.FireAsync(
+                "Cancelled",
+                "Your record is safe :)",
+                SweetAlertIcon.Question
+                );
+        }
+
+    }
+    /// <summary>
+    /// Here we simulate getting the paged, filtered and ordered data from the server
+    /// </summary>
+    private async Task<TableData<EmployeeEntity>> ServerReload(TableState state)
+    {
+        IEnumerable<EmployeeEntity> data = await _employeeService.GetAllAsync();
+        await Task.Delay(300);
+        data = data.Where(element =>
+        {
+            if (string.IsNullOrWhiteSpace(searchString))
+                return true;
+            if (element.Address.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+            if (element.LastName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+            if (element.FirstName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+            return false;
+        }).ToArray();
+        totalItems = data.Count();
+        // switch (state.SortLabel)
+        // {
+        //     case "fn_field":
+        //         data = data.OrderByDirection(state.SortDirection, o => o.FirstName);
+        //         break;
+        //     case "ln_field":
+        //         data = data.OrderByDirection(state.SortDirection, o => o.LastName);
+        //         break;
+        //     case "ad_field":
+        //         data = data.OrderByDirection(state.SortDirection, o => o.Address);
+        //         break;
+        //     case "position_field":
+        //         data = data.OrderByDirection(state.SortDirection, o => o.Position);
+        //         break;
+        //     case "dob_field":
+        //         data = data.OrderByDirection(state.SortDirection, o => o.DateOfBirth);
+        //         break;
+        //         // case "mass_field":
+        //         //     data = data.OrderByDirection(state.SortDirection, o => o.Molar);
+        //         //     break;
+        // }
+
+        pagedData = data.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();
+        return new TableData<EmployeeEntity>() { TotalItems = totalItems, Items = pagedData };
+    }
+
+    private void OnSearch(string text)
+    {
+        searchString = text;
+        table.ReloadServerData();
+    }
+
+
+    async Task SaveEmployeeEntity()
+    {
+        var result = await _employeeService.UpdateAsync(modalEmployee);
+        Swal.FireAsync("Update Employee", "Update Employee Succesful", SweetAlertIcon.Success);
+        modal.Close();
+        table.SelectedItems = null;
+        StateHasChanged();
+    }
+
+    class ElementComparer : IEqualityComparer<EmployeeEntity>
+    {
+        public bool Equals(EmployeeEntity a, EmployeeEntity b) => a?.Id == b?.Id;
+        public int GetHashCode(EmployeeEntity x) => HashCode.Combine(x?.Id);
+    }
+}

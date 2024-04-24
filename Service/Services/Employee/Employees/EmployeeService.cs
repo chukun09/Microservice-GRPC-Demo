@@ -5,6 +5,7 @@ using DomainService.UnitOfWorks.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -23,10 +24,13 @@ namespace Service.Services.Employee.Employees
 
         public async Task<EmployeeEntity> CreateAsync(EmployeeEntity entity, CancellationToken ct)
         {
-            var department = await _unitOfWork.DepartmentRepository.FirstOrDefaultAsync(x => x.Id == entity.DepartmentId);
-            if (department == null)
+            if (entity.DepartmentId != null)
             {
-                throw new Exception("Department doesn't exist");
+                var department = await _unitOfWork.DepartmentRepository.FirstOrDefaultAsync(x => x.Id == entity.DepartmentId);
+                if (department == null)
+                {
+                    throw new Exception("Department doesn't exist");
+                }
             }
             await _unitOfWork.EmployeeRepository.InsertAsync(entity);
             await _unitOfWork.SaveChangesAsync(ct);
@@ -40,6 +44,7 @@ namespace Service.Services.Employee.Employees
             {
                 await _unitOfWork.EmployeeRepository.Delete(employee.Id);
                 await _unitOfWork.SaveChangesAsync(ct);
+                return;
             }
             throw new CustomException("Id not match with any information, please check again");
         }
@@ -57,6 +62,11 @@ namespace Service.Services.Employee.Employees
 
             // We got 1 or more employees to return
             return new List<EmployeeEntity>(results);
+        }
+
+        public async Task<EmployeeEntity> GetByConditionAsync(Expression<Func<EmployeeEntity, bool>> condition, CancellationToken ct)
+        {
+            return await _unitOfWork.EmployeeRepository.FirstOrDefaultAsync(condition);
         }
 
         public async Task<EmployeeEntity> GetByIdAsync(Guid id, CancellationToken ct)

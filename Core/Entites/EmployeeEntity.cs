@@ -12,12 +12,16 @@ namespace Core.Entites
     [Table("Employees")]
     public class EmployeeEntity : BaseEntity
     {
-        public required string UserId { get; set; } // Linked to the AspNet Identity User Id
+        public EmployeeEntity()
+        {
+        }
+
+        public required string UserId { get; set; }
         [Required]
         public required string FirstName { get; set; }
         [Required]
         public required string LastName { get; set; }
-        public DateTime DateOfBirth { get; set; }
+        public DateTime? DateOfBirth { get; set; }
         public string? Address { get; set; }
         public string? Position { get; set; }
         public string? DepartmentId { get; set; }

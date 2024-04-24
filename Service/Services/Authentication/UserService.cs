@@ -95,7 +95,10 @@ namespace Service.Services.Authentication
             {
                 AccessToken = jwtToken,
                 RefreshToken = refreshToken.Token,
-                UserName = user.UserName
+                UserName = user.UserName,
+                UserId = user.Id,
+                FirstName = user.FirstName ?? "",
+                LastName = user.LastName ?? ""
             };
         }
         public async Task<DomainService.AuthenticationService.Input.SignInResult?> RefreshTokenAsync(TokenRequest input)
@@ -198,7 +201,7 @@ namespace Service.Services.Authentication
             else
             {
                 // Step 6: Handle user creation failure
-                throw new CustomException("Sign up failed. See details in result.Errors", 400);
+                throw new CustomException($"Sign up failed. {createResult.Errors?.FirstOrDefault()?.Description}", 400);
             }
         }
 

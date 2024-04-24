@@ -5,6 +5,7 @@ using DomainService.UnitOfWorks.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -35,6 +36,7 @@ namespace Service.Services.Attendance.Attendances
             {
                 await _unitOfWork.AttendanceRepository.Delete(employee.Id);
                 await _unitOfWork.SaveChangesAsync(ct);
+                return;
             }
             throw new CustomException("Id not match with any information, please check again");
         }
@@ -52,6 +54,18 @@ namespace Service.Services.Attendance.Attendances
 
             // We got 1 or more employees to return
             return new List<AttendanceEntity>(results);
+        }
+
+        /// <summary>
+        /// Get by condition
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<AttendanceEntity> GetByConditionAsync(Expression<Func<AttendanceEntity, bool>> condition, CancellationToken ct)
+        {
+            return await _unitOfWork.AttendanceRepository.FirstOrDefaultAsync(condition);
         }
 
         public async Task<AttendanceEntity> GetByIdAsync(Guid id, CancellationToken ct)

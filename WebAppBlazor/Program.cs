@@ -1,14 +1,33 @@
+using CurrieTechnologies.Razor.SweetAlert2;
+using Grpc.Net.Client;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using MudBlazor.Services;
 using WebAppBlazor.Data;
+using WebAppBlazor.Pages.Application;
+using WebAppBlazor.Services;
+using WebAppBlazor.Services.Attandance;
+using WebAppBlazor.Services.Department;
+using WebAppBlazor.Services.Employee;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddSingleton<WeatherForecastService>();
 
+// Add scoped for service
+builder.Services.AddScoped<WeatherForecastService>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+builder.Services.AddScoped<IAttendanceService, AttendanceService>();
+// Sweet alert
+builder.Services.AddSweetAlert2();
+// Material UI
+builder.Services.AddMudServices();
+// Config GRPC Client Factory
+builder.Services.AddGRPCClient();
+builder.Services.AddAuthenticationService();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -26,6 +45,7 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.MapBlazorHub();
+app.UseMiddleware<ExceptionMiddleware>();
 app.MapFallbackToPage("/_Host");
 
 app.Run();

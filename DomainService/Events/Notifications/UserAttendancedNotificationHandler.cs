@@ -9,13 +9,11 @@ namespace DomainService.Events.Notifications
     public class UserAttendancedNotificationHandler : INotificationHandler<UserAttendancedNotification>
     {
         private readonly IPublishEndpoint _publisher;
-        private readonly IMapper _mapper;
         private readonly ILogger<UserAttendancedNotificationHandler> _logger;
 
-        public UserAttendancedNotificationHandler(IPublishEndpoint publisher, IMapper mapper, ILogger<UserAttendancedNotificationHandler> logger)
+        public UserAttendancedNotificationHandler(IPublishEndpoint publisher, ILogger<UserAttendancedNotificationHandler> logger)
         {
             _publisher = publisher;
-            _mapper = mapper;
             _logger = logger;
         }
 

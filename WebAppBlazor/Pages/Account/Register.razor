@@ -1,0 +1,86 @@
+﻿@page "/register"
+@layout LoginLayout;
+@using DomainService.Services.AuthenticationService.Input
+@using Grpc.Core
+@using WebAppBlazor.Services.Authentication
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+@inject SweetAlertService Swal;
+@attribute [AllowAnonymous]
+<style>
+    .divider:after,
+    .divider:before {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: #eee;
+    }
+
+    .h-custom {
+        height: calc(100% - 73px);
+    }
+</style>
+<div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+    <EditForm Model="@SignUpInput" OnValidSubmit="HandleRegistration">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="divider d-flex align-items-center my-4">
+            <p class="text-center fw-bold fs-2 mx-3 mb-0">Company Attendance System</p>
+        </div>
+        <!-- FirstName input -->
+        <div class="form-outline mb-4">
+            <InputText type="text" id="form3Example1" class="form-control form-control-lg"
+                       placeholder="First Name" @bind-Value="@SignUpInput.FirstName" />
+        </div>
+        <!-- LastName input -->
+        <div class="form-outline mb-4">
+            <InputText type="text" id="form3Example2" class="form-control form-control-lg"
+                       placeholder="Last Name" @bind-Value="@SignUpInput.LastName" />
+        </div>
+        <!-- Email input -->
+        <div class="form-outline mb-4">
+            <InputText type="email" id="form3Example3" class="form-control form-control-lg"
+                       placeholder="Email" @bind-Value="@SignUpInput.Email" />
+        </div>
+        <!-- UserName input -->
+        <div class="form-outline mb-4">
+            <InputText type="text" id="form3Example5" class="form-control form-control-lg"
+                       placeholder="UserName" @bind-Value="@SignUpInput.UserName" />
+        </div>
+        <!-- Password input -->
+        <div class="form-outline mb-3">
+            <InputText type="password" id="form3Example4" class="form-control form-control-lg"
+                       placeholder="Password" @bind-Value="@SignUpInput.Password" />
+        </div>
+
+        <div class="text-center text-lg-start mt-4 pt-2">
+            <button type="submit" class="btn btn-primary btn-lg" style="padding-left: 2.5rem; padding-right: 2.5rem;">Sign Up</button>
+            <button type="button" class="btn btn-secondary btn-lg" style="padding-left: 2.5rem; padding-right: 2.5rem;" @onclick='() => NavigationManager.NavigateTo("/login")'>Back</button>
+            @* <p class="small fw-bold mt-2 pt-1 mb-0">Don't have an account? <a href="/register" class="link-danger">Register</a></p> *@
+        </div>
+
+    </EditForm>
+</div>
+
+@code {
+
+    private SignUpInput SignUpInput = new SignUpInput();
+
+    private async Task HandleRegistration()
+    {
+        try
+        {
+            await AuthService.Register(SignUpInput);
+            await Swal.FireAsync("Successful", $"Đăng ký tài khoản thành công", "success");
+        }
+        catch (RpcException ex) when (ex.StatusCode == StatusCode.Internal)
+        {
+            await Swal.FireAsync("Errors", ex.Status.Detail, "error");
+            return;
+        }
+
+        NavigationManager.NavigateTo("/");
+
+    }
+}
+

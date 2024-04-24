@@ -60,7 +60,10 @@ namespace AuthMicroservice.Services
             _logger.LogInformation("Signing in");
             return await Task.FromResult(new SignInReply
             {
+                UserId = signInResult.UserId,
                 UserName = signInResult.UserName,
+                FirstName = signInResult.FirstName,
+                LastName = signInResult.LastName,
                 AccessToken = signInResult.AccessToken,
                 RefreshToken = signInResult.RefreshToken
             });
@@ -82,10 +85,24 @@ namespace AuthMicroservice.Services
             _logger.LogInformation("Calling Refresh Token");
             return await Task.FromResult(new SignInReply
             {
+                UserId = refreshTokenResult.UserId,
                 RefreshToken = refreshTokenResult.RefreshToken,
-                AccessToken=refreshTokenResult.AccessToken,
+                FirstName = refreshTokenResult.FirstName,
+                LastName = refreshTokenResult.LastName,
+                AccessToken = refreshTokenResult.AccessToken,
                 UserName = refreshTokenResult.UserName
             });
+        }
+        /// <summary>
+        /// Sign Out
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public override async Task<Empty> SignOut(Empty request, ServerCallContext context)
+        {
+            await _mediator.Send(new SignOutCommand(), context.CancellationToken);
+            return await Task.FromResult(new Empty { });
         }
     }
 }

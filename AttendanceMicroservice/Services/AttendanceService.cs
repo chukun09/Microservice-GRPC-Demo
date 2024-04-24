@@ -59,13 +59,13 @@ namespace AttendanceMicroservice.Services
                 foreach (var entity in attendances)
                 {
                     //Map request message to object
-                    var reply = new Attendance()
+                    var reply = new AttendanceMessage()
                     {
                         Id = entity.Id,
                         CheckinTime = Timestamp.FromDateTime(entity.CheckinTime),
-                        CheckoutTime = Timestamp.FromDateTime(entity.CheckoutTime),
+                        CheckoutTime = entity.CheckoutTime == null ? null : Timestamp.FromDateTime((DateTime) entity.CheckoutTime),
                         Date = entity.Date.ToDateTime(TimeOnly.MinValue).ToUniversalTime().ToTimestamp(),
-                        EmployeeId =entity.EmployeeId,
+                        EmployeeId = entity.EmployeeId,
                     };
                     result.Attendances.Add(reply);
                 }

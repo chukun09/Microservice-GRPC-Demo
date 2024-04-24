@@ -14,7 +14,7 @@ namespace EventBus.Message.Users
         public required string FirstName { get; set; }
         [Required]
         public required string LastName { get; set; }
-        public DateTime? DateOfBirth { get; set; }
-        public string? Address { get; set; }
+        //public DateTime? DateOfBirth { get; set; }
+        //public string? Address { get; set; }
     }
 }

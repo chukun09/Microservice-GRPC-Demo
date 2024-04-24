@@ -1,0 +1,14 @@
+﻿@page "/logout"
+@using WebAppBlazor.Services.Authentication
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+@attribute [Authorize]
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        await AuthService.Logout();
+        NavigationManager.NavigateTo("/");
+    }
+
+}
