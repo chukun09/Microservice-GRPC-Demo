@@ -4,7 +4,8 @@
 @using WebAppBlazor.Services.Department
 @using WebAppBlazor.Services.Employee
 @using WebAppBlazor.Shared.Components
-@attribute [Authorize]
+@* @attribute [Authorize] *@
+@attribute [Authorize(Roles = "Admin")]
 @inject IJSRuntime JSRuntime
 @inject IEmployeeService _employeeService;
 @inject IDepartmentService _departmentService;

@@ -37,7 +37,7 @@ namespace WebAppBlazor.Services.WorkHoursSummary
                     }
                 }
             });
-            await call.RequestStream.WriteAsync(new WorkHoursSummaryMicroservice.Empty());
+            await call.RequestStream.WriteAsync(new Empty());
             await call.RequestStream.CompleteAsync();
             await readTask;
             return summaries;

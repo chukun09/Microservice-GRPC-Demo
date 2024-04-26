@@ -2,10 +2,12 @@
 @layout LoginLayout;
 @using DomainService.AuthenticationService.Input
 @using Grpc.Core
+@using WebAppBlazor.Helper
 @using WebAppBlazor.Services.Authentication
 @inject IAuthService AuthService
 @inject NavigationManager NavigationManager
 @inject SweetAlertService Swal;
+@inject LoginState LoginState;
 @attribute [AllowAnonymous]
 
 
@@ -76,8 +78,9 @@
             await Swal.FireAsync("Errors", ex.Status.Detail, "error");
             return;
         }
-
+        LoginState.LoggedIn = true;
         NavigationManager.NavigateTo("/");
+
 
     }
 }

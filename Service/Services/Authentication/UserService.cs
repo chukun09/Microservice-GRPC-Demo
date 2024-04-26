@@ -64,7 +64,8 @@ namespace Service.Services.Authentication
                 {
                     new Claim("UserName", user.UserName),
                     new Claim("UserId", user.Id),
-                    new Claim("Role", JsonConvert.SerializeObject(roles), JsonClaimValueTypes.JsonArray)
+                    //new Claim("Role", JsonConvert.SerializeObject(roles), JsonClaimValueTypes.JsonArray),
+                    new Claim(ClaimTypes.Role, JsonConvert.SerializeObject(roles), JsonClaimValueTypes.JsonArray)
                 }),
                 Expires = DateTime.UtcNow.AddHours(1),
                 SigningCredentials = new SigningCredentials(

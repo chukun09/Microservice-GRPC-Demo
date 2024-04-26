@@ -3,7 +3,7 @@
 @using DepartmentMicroservice
 @using WebAppBlazor.Services.Department
 @using WebAppBlazor.Shared.Components
-@attribute [Authorize]
+@attribute [Authorize(Roles = "Admin")]
 @inject IJSRuntime JSRuntime
 @inject IDepartmentService _departmentService;
 @inject SweetAlertService Swal;
