@@ -56,7 +56,7 @@ namespace AuthenticationWithClientSideBlazor.Client
             var jsonBytes = ParseBase64WithoutPadding(payload);
             var keyValuePairs = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonBytes);
 
-            keyValuePairs.TryGetValue(ClaimTypes.Role, out object roles);
+            keyValuePairs.TryGetValue("Role", out object roles);
 
             if (roles != null)
             {

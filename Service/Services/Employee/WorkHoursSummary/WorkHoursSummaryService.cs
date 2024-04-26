@@ -41,6 +41,17 @@ namespace Service.Services.Employee.WorkHoursSummary
             throw new CustomException("Id not match with any information, please check again");
         }
 
+        public async Task<WorkHoursSummaryEntity> FirstOrDefaultAsync(Expression<Func<WorkHoursSummaryEntity, bool>> expression, CancellationToken ct)
+        {
+            return await _unitOfWork.WorkHoursSummaryRepository.FirstOrDefaultAsync(expression);
+        }
+
+        public async Task<List<WorkHoursSummaryEntity>> GetAllWorkHoursSummaryEntityIdAsync(string employeeId, CancellationToken ct)
+        {
+            var result = await _unitOfWork.WorkHoursSummaryRepository.GetAllAsync(x => x.EmployeeId == employeeId, orderBy: x => x.OrderBy(c => c.SummaryDate));
+            return result.ToList();
+        }
+
         public async Task<List<WorkHoursSummaryEntity>> GetAsync(CancellationToken ct)
         {
             var results = await _unitOfWork.WorkHoursSummaryRepository.GetAllAsync();

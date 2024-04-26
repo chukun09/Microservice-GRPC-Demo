@@ -2,6 +2,14 @@
 @attribute [Authorize]
 @using System
 @using System.Threading.Tasks
+@using System.Security.Claims
+@using Blazored.LocalStorage
+@using Core.Entites
+@using WebAppBlazor.Services.Attendance
+@using WebAppBlazor.Services.Employee
+@inject ILocalStorageService _localStorage;
+@inject IAttendanceService _AttendanceService;
+@inject AuthenticationStateProvider AuthenticationStateProvider
 <div class="container">
     <div class="row mt-5">
         <div class="col-md-8 offset-md-2 text-center">
@@ -11,12 +19,12 @@
 
             <div class="row">
                 <div class="col-md-6">
-                    <button class="btn btn-success btn-lg btn-block" @onclick="CheckIn">
+                    <button class="btn btn-success btn-lg btn-block" disabled="@isCheckedIn" @onclick="CheckIn">
                         <i class="fas fa-sign-in-alt mr-2"></i> Check-In
                     </button>
                 </div>
                 <div class="col-md-6">
-                    <button class="btn btn-danger btn-lg btn-block" @onclick="CheckOut">
+                    <button class="btn btn-danger btn-lg btn-block" disabled="@isCheckedOut" @onclick="CheckOut">
                         <i class="fas fa-sign-out-alt mr-2"></i> Check-Out
                     </button>
                 </div>
@@ -26,14 +34,14 @@
 
             @if (isCheckedIn)
             {
-                <div class="alert alert-success" role="alert">
-                    You are currently checked in. Last check-in time: @lastCheckInTime
+                <div class="alert alert-success mt-3" role="alert">
+                    You are currently checked in today. Last check-in time: @attendanceInfor.CheckinTime
                 </div>
             }
-            else
+            @if (isCheckedOut)
             {
-                <div class="alert alert-danger" role="alert">
-                    You are currently checked out. Last check-out time: @lastCheckOutTime
+                <div class="alert alert-danger mt-3" role="alert">
+                    You are currently checked out today. Last check-out time: @attendanceInfor.CheckoutTime
                 </div>
             }
         </div>
@@ -44,17 +52,57 @@
     private bool isCheckedIn = false;
     private DateTime lastCheckInTime;
     private DateTime lastCheckOutTime;
-
+    private ClaimsPrincipal user = new ClaimsPrincipal();
+    private string userId = "";
+    private bool isCheckedOut = false;
+    private string employeeId = "";
+    private AttendanceEntity attendanceInfor = new AttendanceEntity();
+    protected override async void OnInitialized()
+    {
+        await CheckUserLogin();
+        await checkAttendanceStatus();
+    }
     private async Task CheckIn()
     {
-        isCheckedIn = true;
-        lastCheckInTime = DateTime.Now;
-        lastCheckOutTime = DateTime.MinValue; // Reset check-out time
+        DateOnly today = DateOnly.FromDateTime(DateTime.Now);
+        var attendanceCheckIn = new AttendanceEntity()
+            {
+                CheckinTime = DateTime.Now,
+                CheckoutTime = null,
+                Date = today,
+                EmployeeId = employeeId,
+            };
+        await _AttendanceService.AddAsync(attendanceCheckIn);
+        await checkAttendanceStatus();
     }
 
     private async Task CheckOut()
     {
-        isCheckedIn = false;
-        lastCheckOutTime = DateTime.Now;
+        var attendanceToCheckOut = await _AttendanceService.GetAttendanceByEmployeeIdAsync(employeeId);
+        attendanceToCheckOut.CheckoutTime = DateTime.Now;
+        attendanceToCheckOut.CheckinTime = attendanceToCheckOut.CheckinTime.AddHours(-7);
+        await _AttendanceService.UpdateAsync(attendanceToCheckOut);
+        await checkAttendanceStatus();
+    }
+    private async Task checkAttendanceStatus()
+    {
+        employeeId = await _localStorage.GetItemAsync<string>("employeeId") ?? "";
+        if (!string.IsNullOrEmpty(employeeId))
+        {
+            attendanceInfor = await _AttendanceService.GetAttendanceByEmployeeIdAsync(employeeId);
+            if (attendanceInfor == null) return;
+            if (attendanceInfor?.CheckinTime != null) isCheckedIn = true;
+            var isNullCheckOutTime = DateTime.MinValue != attendanceInfor?.CheckoutTime.GetValueOrDefault().AddHours(-7);
+            if (attendanceInfor?.CheckoutTime != null && isNullCheckOutTime) isCheckedOut = true;
+        }
+        StateHasChanged();
+        return;
+    }
+    private async Task CheckUserLogin()
+    {
+        var authState = await AuthenticationStateProvider
+            .GetAuthenticationStateAsync();
+        user = authState.User;
+        userId = user?.FindFirstValue("userId") ?? "";
     }
 }

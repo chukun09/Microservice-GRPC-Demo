@@ -9,6 +9,7 @@ using DomainService.Services.AuthenticationService.Input;
 using Core.Entites;
 using DomainService.AuthenticationService.Input;
 using AuthMicroservice.Protos;
+using WebAppBlazor.Services.Employee;
 
 namespace WebAppBlazor.Services.Authentication
 {
@@ -17,14 +18,14 @@ namespace WebAppBlazor.Services.Authentication
         private readonly Userer.UsererClient _userClient;
         private readonly AuthenticationStateProvider _authenticationStateProvider;
         private readonly ILocalStorageService _localStorage;
+        private readonly IEmployeeService _employeeService;
 
-        public AuthService(
-                           AuthenticationStateProvider authenticationStateProvider,
-                           ILocalStorageService localStorage, Userer.UsererClient userClient)
+        public AuthService(Userer.UsererClient userClient, AuthenticationStateProvider authenticationStateProvider, ILocalStorageService localStorage, IEmployeeService employeeService)
         {
+            _userClient = userClient;
             _authenticationStateProvider = authenticationStateProvider;
             _localStorage = localStorage;
-            _userClient = userClient;
+            _employeeService = employeeService;
         }
 
         public async Task Register(SignUpInput registerModel)
@@ -54,8 +55,9 @@ namespace WebAppBlazor.Services.Authentication
             await _localStorage.SetItemAsync("accessToken", response.AccessToken);
             await _localStorage.SetItemAsync("refreshToken", response.RefreshToken);
             ((ApiAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsAuthenticated(loginModel.Username);
+            var employeeMapping = await _employeeService.GetEmployeeByUserId(response.UserId);
             //_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", response.AccessToken);
-
+            await _localStorage.SetItemAsync("employeeId", employeeMapping.Id);
             var result = new SignInResult()
             {
                 AccessToken = response.AccessToken,
@@ -72,6 +74,7 @@ namespace WebAppBlazor.Services.Authentication
         {
             await _localStorage.RemoveItemAsync("accessToken");
             await _localStorage.RemoveItemAsync("refreshToken");
+            await _localStorage.RemoveItemAsync("employeeId");
             ((ApiAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsLoggedOut();
             //_httpClient.DefaultRequestHeaders.Authorization = null;
             var empty = new Empty();

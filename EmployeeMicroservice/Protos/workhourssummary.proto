@@ -6,7 +6,7 @@ import "Protos/google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
 package workhourssumary;
 
-service WorkHoursSummaryService {
+service WorkHoursSummaryServicer {
 		rpc AddWorkHoursSummary (AddWorkHoursSummaryRequest) returns (WorkHoursSummaryReply){
 	option (google.api.http) = {
       post: "/v1/work-hours-summary/add-work-hours-summary",
@@ -16,13 +16,14 @@ service WorkHoursSummaryService {
 	rpc UpdateWorkHoursSummary (WorkHoursSummaryRequest) returns (WorkHoursSummaryReply){
 	option (google.api.http) = {
       put: "/v1/work-hours-summary/add-work-hours-summary",
-	  body: "work-hours-summary"
+	  body: "workHoursSummary"
     };
 	};
 	rpc DeleteWorkHoursSummary (DeleteWorkHoursSummaryRequest) returns (WorkHoursSummaryReply);
 	// Get all workHoursSummary
 	rpc GetAllWorkHoursSummary (stream Empty) returns (stream GetAllWorkHoursSummaryReply){
 	};
+	rpc GetAllWorkHoursSummaryByEmployee (GetAllWorkHoursSummaryByEmployeeRequest) returns (GetAllWorkHoursSummaryReply);
 }
 	message WorkHoursSummaryRequest {
 	WorkHoursSummary workHoursSummary = 1;
@@ -33,11 +34,15 @@ message AddWorkHoursSummaryRequest {
   string summaryDate = 2;
   int32 totalWorkedHours = 3;
 }
+message GetAllWorkHoursSummaryByEmployeeRequest {
+  string employeeId = 1;
+}
+
 
 message WorkHoursSummary {
   string id = 1;
   string employeeId = 2;
-  string summaryDate = 3;
+  google.protobuf.Timestamp summaryDate = 3;
   int32 totalWorkedHours = 4;
 }
 

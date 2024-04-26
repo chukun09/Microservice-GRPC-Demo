@@ -64,6 +64,10 @@ namespace WebAppBlazor.Services.Employee
                             DateOfBirth = employee.DateOfBirth?.ToDateTime(),
                             Id = employee.Id,
                             DepartmentId = employee.DepartmentId,
+                            Department = new DepartmentEntity()
+                            {
+                                Name = employee.Department
+                            }
                         };
                         employees.Add(mappingEmployee);
 
@@ -78,6 +82,30 @@ namespace WebAppBlazor.Services.Employee
             await readTask;
             return employees;
 
+        }
+
+        public async Task<EmployeeEntity> GetEmployeeByUserId(string userId)
+        {
+            var employee = await _employeerClient.GetEmployeeByUserIdAsync(new GetEmployeeByUserIdRequest()
+            {
+                UserId = userId
+            });
+            var result = new EmployeeEntity()
+            {
+                FirstName = employee.FirstName,
+                LastName = employee.LastName,
+                Position = employee.Position,
+                UserId = employee.UserId,
+                Address = employee.Address,
+                DateOfBirth = employee.DateOfBirth?.ToDateTime(),
+                Id = employee.Id,
+                DepartmentId = employee.DepartmentId,
+                Department = new DepartmentEntity()
+                {
+                    Name = employee.Department
+                }
+            };
+            return result;
         }
 
         public async Task<EmployeeEntity> UpdateAsync(EmployeeEntity entity)

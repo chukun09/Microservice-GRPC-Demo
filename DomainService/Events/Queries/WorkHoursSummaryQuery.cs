@@ -9,5 +9,6 @@ using System.Threading.Tasks;
 namespace DomainService.Events.Queries
 {
     public record GetAllWorkHoursSummaryQuery : IRequest<List<WorkHoursSummaryEntity>>;
+    public record GetAllWorkHoursSummaryByEmployeeIdQuery(string employeeId) : IRequest<List<WorkHoursSummaryEntity>>;
     public record GetWorkHoursSummaryByIdQuery(Guid id) : IRequest<WorkHoursSummaryEntity>;
 }

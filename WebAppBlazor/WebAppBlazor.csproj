@@ -32,8 +32,4 @@
     <Protobuf Include="Protos\workhourssummary.proto" GrpcServices="Client" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Helper\" />
-  </ItemGroup>
-
 </Project>

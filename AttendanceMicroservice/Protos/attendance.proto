@@ -24,7 +24,10 @@ service Attendancer {
 	rpc DeleteAttendance (DeleteAttendanceRequest) returns (AttendanceReply);
 	// Get all attendance
 	rpc GetAllAttendance (stream Empty) returns (stream GetAllAttendanceReply){
+
 	};
+	rpc GetAllAttendanceByEmployeeId (GetAttendanceByEmployeeIdRequest) returns (GetAllAttendanceReply);
+	rpc GetAttendanceByEmployeeId (GetAttendanceByEmployeeIdRequest) returns (GetAttendanceByEmployeeIdResponse);
 }
 
 
@@ -38,7 +41,9 @@ message AddAttendanceRequest {
   google.protobuf.Timestamp checkinTime = 3;
   google.protobuf.Timestamp checkoutTime = 4;
 }
-
+message GetAttendanceByEmployeeIdRequest {
+  string employeeId = 1;
+}
 message AttendanceMessage {
   string id = 1;
   string employeeId = 2;
@@ -47,6 +52,12 @@ message AttendanceMessage {
   google.protobuf.Timestamp checkoutTime = 5;
 }
 
+message GetAttendanceByEmployeeIdResponse {
+	oneof attendance {
+	AttendanceMessage result = 1;
+	Empty empty = 2;
+	}
+}
 message DeleteAttendanceRequest{
 	string employeeId = 1;
 }

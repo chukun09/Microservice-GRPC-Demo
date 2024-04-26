@@ -5,6 +5,7 @@ using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using static Grpc.Core.Metadata;
 
 namespace AttendanceMicroservice.Services
 {
@@ -63,7 +64,7 @@ namespace AttendanceMicroservice.Services
                     {
                         Id = entity.Id,
                         CheckinTime = Timestamp.FromDateTime(entity.CheckinTime),
-                        CheckoutTime = entity.CheckoutTime == null ? null : Timestamp.FromDateTime((DateTime) entity.CheckoutTime),
+                        CheckoutTime = entity.CheckoutTime == null ? null : Timestamp.FromDateTime((DateTime)entity.CheckoutTime),
                         Date = entity.Date.ToDateTime(TimeOnly.MinValue).ToUniversalTime().ToTimestamp(),
                         EmployeeId = entity.EmployeeId,
                     };
@@ -71,6 +72,31 @@ namespace AttendanceMicroservice.Services
                 }
                 await responseStream.WriteAsync(result);
             }
+        }
+        /// <summary>
+        /// Get All Attendance By Employee
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public async override Task<GetAllAttendanceReply> GetAllAttendanceByEmployeeId(GetAttendanceByEmployeeIdRequest request, ServerCallContext context)
+        {
+            var attendances = await _mediator.Send(new GetAllAttendanceByEmployeeIdQuery(request.EmployeeId), context.CancellationToken);
+            var result = new GetAllAttendanceReply();
+            foreach (var entity in attendances)
+            {
+                //Map request message to object
+                var reply = new AttendanceMessage()
+                {
+                    Id = entity.Id,
+                    CheckinTime = Timestamp.FromDateTime(entity.CheckinTime),
+                    CheckoutTime = Timestamp.FromDateTime(entity.CheckoutTime.GetValueOrDefault().ToUniversalTime()),
+                    Date = entity.Date.ToDateTime(TimeOnly.MinValue).ToUniversalTime().ToTimestamp(),
+                    EmployeeId = entity.EmployeeId,
+                };
+                result.Attendances.Add(reply);
+            }
+            return result;
         }
         /// <summary>
         /// Update Attendance
@@ -109,6 +135,36 @@ namespace AttendanceMicroservice.Services
             {
                 Message = "Xóa thành công"
             });
+        }
+        /// <summary>
+        /// Get Attendance By Employee Id
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public async override Task<GetAttendanceByEmployeeIdResponse> GetAttendanceByEmployeeId(GetAttendanceByEmployeeIdRequest request, ServerCallContext context)
+        {
+            var Attendance = await _mediator.Send(new GetAttendanceByEmployeeIdQuery(request.EmployeeId), context.CancellationToken);
+            if (Attendance == null) return await Task.FromResult(new GetAttendanceByEmployeeIdResponse()
+            {
+                Empty = new Empty()
+            });
+            var dateTime = Attendance.Date.ToDateTime(TimeOnly.MaxValue);
+            var checkInTime = Timestamp.FromDateTime(Attendance.CheckinTime.ToUniversalTime());
+            var checkOutTime = Timestamp.FromDateTime(Attendance.CheckoutTime.GetValueOrDefault().ToUniversalTime());
+            var result = new GetAttendanceByEmployeeIdResponse()
+            {
+                Result = new AttendanceMessage()
+                {
+                    Id = Attendance.Id,
+                    CheckinTime = checkInTime,
+                    CheckoutTime = checkOutTime,
+                    Date = dateTime.ToUniversalTime().ToTimestamp(),
+                    EmployeeId = Attendance.EmployeeId,
+                }
+            };
+            return result;
+
         }
 
     }

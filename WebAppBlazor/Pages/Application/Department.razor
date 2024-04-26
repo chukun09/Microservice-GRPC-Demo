@@ -23,17 +23,17 @@
 <div class="d-flex justify-content-end m-3">
     <ul class="list-inline m-0">
         <li class="list-inline-item">
-            <button class="btn btn-sm btn-info" type="button" @onclick="openCreateModal" data-placement="top" title="Create">
+            <button class="btn btn-sm btn-primary" type="button" @onclick="openCreateModal" data-placement="top" title="Create">
                 <img src="/images/icon-create.svg" height="16px" /> Create
             </button>
         </li>
         <li class="list-inline-item">
-            <button class="btn btn-sm btn-info" disabled="@(isMultipleSelected)" type="button" @onclick="openEditModal" data-placement="top" title="Edit">
+            <button class="btn btn-sm btn-primary" disabled="@(!isSingleSelected)" type="button" @onclick="openEditModal" data-placement="top" title="Edit">
                 <img src="/images/icon-edit.svg" height="16px" /> Edit
             </button>
         </li>
         <li class="list-inline-item">
-            <button class="btn btn-sm btn-info" type="button" @onclick="Delete" data-placement="top" title="Delete">
+            <button class="btn btn-sm btn-danger" type="button" disabled="@(!table?.SelectedItems?.Any())" @onclick="Delete" data-placement="top" title="Delete">
                 <img src="/images/icon-delete.svg" height="16px" /> Delete
             </button>
         </li>
@@ -43,7 +43,7 @@
 <MudTable ServerData="@(new Func<TableState, Task<TableData<DepartmentEntity>>>(ServerReload))" T="DepartmentEntity"
           Hover="true" @ref="table" MultiSelection="true" SelectedItemsChanged="OnSelectedItemsChanged" Comparer="Comparer">
     <ToolBarContent>
-        <MudText Typo="Typo.h6">Periodic Departments</MudText>
+        <MudText Typo="Typo.h6">Table Departments</MudText>
         <MudSpacer />
         <MudTextField T="string" ValueChanged="@(s=>OnSearch(s))" Placeholder="Search" Adornment="Adornment.Start"
                       AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
@@ -70,23 +70,26 @@
 <Modal @ref="modal">
     <Title>Department Modal</Title>
     <Body>
-        <EditForm Model="@modalDepartment" OnValidSubmit="SaveDepartment">
+        <EditForm Model="@departmentModel" OnValidSubmit="SaveDepartmentEntity">
             <DataAnnotationsValidator />
             <ValidationSummary />
             <div class="mb-3">
                 <label for="name" class="form-label">Name</label>
-                <InputText type="text" class="form-control" id="name" @bind-Value="modalDepartment.Name" placeholder="Name" />
+                <InputText type="text" class="form-control" id="name" @bind-Value="departmentModel.Name" placeholder="Name" />
             </div>
             <div class="mb-3">
                 <label for="description" class="form-label">Description</label>
-                <InputText type="text" class="form-control" id="lastName" @bind-Value="modalDepartment.Description" placeholder="Description" />
+                <InputText type="text" class="form-control" id="lastName" @bind-Value="departmentModel.Description" placeholder="Description" />
+            </div>
+            <hr />
+            <div class="d-flex justify-content-end m-3">
+                <button type="submit" class="btn btn-primary me-3">Save changes</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="() => modal.Close()">Close</button>
             </div>
         </EditForm>
     </Body>
-    <Footer>
-        <button type="button" class="btn btn-primary" @onclick="SaveDepartmentEntity">Save changes</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="() => modal.Close()">Close</button>
-    </Footer>
+    @*     <Footer>
+    </Footer> *@
 </Modal>
 @code {
     private IEnumerable<DepartmentEntity> pagedData;
@@ -95,38 +98,44 @@
     private int totalItems;
     private string searchString = null;
     private DepartmentEntity selectedDepartment;
-    private DepartmentEntity modalDepartment = new DepartmentEntity();
+    private DepartmentEntity departmentModel = new DepartmentEntity();
     private Modal modal { get; set; }
-    private bool isMultipleSelected = false;
-    private void SaveDepartment()
-    {
-        // Implement logic to save the modalDepartment object
-        // For example, you can call a method in a service to save the department data
+    private bool isSingleSelected = false;
+    // private bool isSelected
+    // private void SaveDepartment()
+    // {
+    //     // Implement logic to save the departmentModel object
+    //     // For example, you can call a method in a service to save the department data
 
-        modal.Close(); // Close the modal after saving
-    }
+    //     modal.Close(); // Close the modal after saving
+    // }
     private void OnSelectedItemsChanged(HashSet<DepartmentEntity> elements)
     {
         if (elements.Count == 1)
         {
-            isMultipleSelected = false;
+            isSingleSelected = true;
             selectedDepartment = elements.First();
         }
         else
         {
             selectedDepartment = new DepartmentEntity();
-            isMultipleSelected = true;
+            isSingleSelected = false;
         }
     }
     private async Task openCreateModal()
     {
-        modalDepartment = new DepartmentEntity();
-        modalDepartment.Id = null;
+        departmentModel = new DepartmentEntity();
+        departmentModel.Id = null;
         await modal.Open();
     }
     private async Task openEditModal()
     {
-        modalDepartment = selectedDepartment;
+        departmentModel = new DepartmentEntity()
+            {
+                Id = selectedDepartment.Id,
+                Description = selectedDepartment.Description,
+                Name = selectedDepartment.Name
+            };
         await modal.Open();
     }
     private async Task Delete()
@@ -176,7 +185,7 @@
                 return true;
             if (element.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
                 return true;
-            if (element.Description.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            if (element.Description?.Contains(searchString, StringComparison.OrdinalIgnoreCase) ?? false)
                 return true;
             return false;
         }).ToArray();
@@ -190,23 +199,24 @@
     {
         searchString = text;
         table.ReloadServerData();
+        table.SelectedItems = null;
     }
 
 
     async Task SaveDepartmentEntity()
     {
-        if (string.IsNullOrEmpty(modalDepartment?.Id))
+        if (string.IsNullOrEmpty(departmentModel?.Id))
         {
 
-            var result = await _departmentService.AddAsync(modalDepartment);
-            Swal.FireAsync("Create Department", "Create Department Succesful", SweetAlertIcon.Success);
-            modal.Close();
+            var result = await _departmentService.AddAsync(departmentModel);
+            await Swal.FireAsync("Create Department", "Create Department Succesful", SweetAlertIcon.Success);
+            await modal.Close();
         }
         else
         {
-            var result = await _departmentService.UpdateAsync(modalDepartment);
-            Swal.FireAsync("Update Department", "Update Department Succesful", SweetAlertIcon.Success);
-            modal.Close();
+            var result = await _departmentService.UpdateAsync(departmentModel);
+            await Swal.FireAsync("Update Department", "Update Department Succesful", SweetAlertIcon.Success);
+            await modal.Close();
             table.SelectedItems = null;
         }
         await Task.Delay(300);

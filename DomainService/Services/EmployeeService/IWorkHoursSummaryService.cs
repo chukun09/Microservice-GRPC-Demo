@@ -9,5 +9,7 @@ namespace DomainService.Services.EmployeeService
 {
     public interface IWorkHoursSummaryService : IBaseService<WorkHoursSummaryEntity>
     {
+        Task<List<WorkHoursSummaryEntity>> GetAllWorkHoursSummaryEntityIdAsync(string employeeId, CancellationToken ct);
+
     }
 }

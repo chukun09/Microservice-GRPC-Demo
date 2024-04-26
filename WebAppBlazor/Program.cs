@@ -6,9 +6,10 @@ using MudBlazor.Services;
 using WebAppBlazor.Data;
 using WebAppBlazor.Pages.Application;
 using WebAppBlazor.Services;
-using WebAppBlazor.Services.Attandance;
+using WebAppBlazor.Services.Attendance;
 using WebAppBlazor.Services.Department;
 using WebAppBlazor.Services.Employee;
+using WebAppBlazor.Services.WorkHoursSummary;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,7 @@ builder.Services.AddScoped<WeatherForecastService>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<IAttendanceService, AttendanceService>();
+builder.Services.AddScoped<IWorkHoursSummaryService, WorkHoursSummaryService>();
 // Sweet alert
 builder.Services.AddSweetAlert2();
 // Material UI
@@ -28,6 +30,8 @@ builder.Services.AddMudServices();
 // Config GRPC Client Factory
 builder.Services.AddGRPCClient();
 builder.Services.AddAuthenticationService();
+
+builder.Services.AddHttpContextAccessor();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

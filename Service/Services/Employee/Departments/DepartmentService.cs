@@ -41,16 +41,21 @@ namespace Service.Services.Department.Departments
             throw new CustomException("Id not match with any information, please check again");
         }
 
+        public async Task<DepartmentEntity> FirstOrDefaultAsync(Expression<Func<DepartmentEntity, bool>> expression, CancellationToken ct)
+        {
+            return await _unitOfWork.DepartmentRepository.FirstOrDefaultAsync(expression);
+        }
+
         public async Task<List<DepartmentEntity>> GetAsync(CancellationToken ct)
         {
             var results = await _unitOfWork.DepartmentRepository.GetAllAsync();
 
             // Check that we actually got some employees from the database
-            if (results == null || results.Count() == 0)
-            {
-                // No employees were available in the database
-                throw new KeyNotFoundException("There are no records in the database. Please add one or more employees and try again.");
-            }
+            //if (results == null || results.Count() == 0)
+            //{
+            //    // No employees were available in the database
+            //    throw new KeyNotFoundException("There are no records in the database. Please add one or more employees and try again.");
+            //}
 
             // We got 1 or more employees to return
             return new List<DepartmentEntity>(results);

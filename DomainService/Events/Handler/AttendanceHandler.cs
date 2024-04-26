@@ -26,6 +26,23 @@ namespace DomainService.Events.Handler
         }
     }
     /// <summary>
+    /// Get All Attendance By EmployeeId
+    /// </summary>
+    public class GelAllAttendanceByEmployeeIdHandler : IRequestHandler<GetAllAttendanceByEmployeeIdQuery, List<AttendanceEntity>>
+    {
+        private readonly IAttendanceService _service;
+
+        public GelAllAttendanceByEmployeeIdHandler(IAttendanceService service)
+        {
+            _service = service;
+        }
+
+        public async Task<List<AttendanceEntity>> Handle(GetAllAttendanceByEmployeeIdQuery request, CancellationToken cancellationToken)
+        {
+            return await _service.GetAllAttandanceByEmployeeIdAsync(request.employeeId, cancellationToken);
+        }
+    }
+    /// <summary>
     /// Get By Id
     /// </summary>
     public class GelByIdAttendanceHandler : IRequestHandler<GetAttendanceByIdQuery, AttendanceEntity>
@@ -40,6 +57,23 @@ namespace DomainService.Events.Handler
         public async Task<AttendanceEntity> Handle(GetAttendanceByIdQuery request, CancellationToken cancellationToken)
         {
             return await _service.GetByIdAsync(request.id, cancellationToken);
+        }
+    }    /// <summary>
+         /// Get By EmployeeId
+         /// </summary>
+    public class GelByEmployeeIdAttendanceHandler : IRequestHandler<GetAttendanceByEmployeeIdQuery, AttendanceEntity>
+    {
+        private readonly IAttendanceService _service;
+
+        public GelByEmployeeIdAttendanceHandler(IAttendanceService service)
+        {
+            _service = service;
+        }
+
+        public async Task<AttendanceEntity> Handle(GetAttendanceByEmployeeIdQuery request, CancellationToken cancellationToken)
+        {
+            DateOnly today = DateOnly.FromDateTime(DateTime.Now);
+            return await _service.FirstOrDefaultAsync(x => x.EmployeeId == request.employeeId && x.Date == today, cancellationToken);
         }
     }
     /// <summary>
@@ -70,6 +104,7 @@ namespace DomainService.Events.Handler
         public override async Task<AttendanceEntity> Handle(UpdateAttendanceCommand request, CancellationToken cancellationToken)
         {
             var result = await _service.UpdateAsync(request.entity, cancellationToken);
+            await _mediator.Publish(new UserAttendancedNotification(result), cancellationToken);
             return result;
         }
     }

@@ -44,7 +44,7 @@ namespace WebAppBlazor.Services
                 var token = await provider.GetTokenAsync(context.CancellationToken);
                 metadata.Add("Authorization", $"Bearer {token}");
             });
-            services.AddGrpcClient<WorkHoursSummaryService.WorkHoursSummaryServiceClient>(options =>
+            services.AddGrpcClient<WorkHoursSummaryServicer.WorkHoursSummaryServicerClient>(options =>
             {
                 options.Address = channelEmployeeURI;
             }).AddCallCredentials(async (context, metadata, serviceProvider) =>
@@ -53,7 +53,7 @@ namespace WebAppBlazor.Services
                 var token = await provider.GetTokenAsync(context.CancellationToken);
                 metadata.Add("Authorization", $"Bearer {token}");
             });
-            // Inject channel into each gRPC Attandance client
+            // Inject channel into each gRPC Attendance client
             services.AddGrpcClient<Attendancer.AttendancerClient>(options =>
             {
                 options.Address = channelAttendanceURI;

@@ -1,7 +1,53 @@
 ﻿@page "/work-hours-summary"
+@using Blazored.LocalStorage
+@using Core.Entites
+@using WebAppBlazor.Services.WorkHoursSummary
+@inject IWorkHoursSummaryService _workHoursSummaryService;
+@inject ILocalStorageService _localStorageService;
 @attribute [Authorize]
 <h3>Work Hours Summary</h3>
-
+<h4 class="text-center d-flex justify-content-center mb-4">Yours Work Hours Summary (Hours)</h4>
+<div>
+    <MudChart ChartType="ChartType.Bar" ChartSeries="@Series" XAxisLabels="@XAxisLabels" ChartOptions="new ChartOptions(){YAxisTicks = 2, XAxisLines = true}" Width="100%" Height="500px"></MudChart>
+</div>
 @code {
+    private IEnumerable<WorkHoursSummaryEntity> listSummaries = new List<WorkHoursSummaryEntity>();
+    public List<ChartSeries> Series = new List<ChartSeries>();
+    public string[] XAxisLabels = new string[0];
+    protected override async void OnInitialized()
+    {
+        await InitDataChart();
+    }
+    public async Task InitDataChart()
+    {
+        var employeeId = await _localStorageService.GetItemAsync<string>("employeeId");
+        listSummaries = await _workHoursSummaryService.GetAllWorkHoursSummaryByEmployee(employeeId ?? "");
+        var series = new ChartSeries()
+            {
+                Name = "Total Works Summary",
+                Data = convertShortArrayToDoubleArray(listSummaries.Select(x => x.TotalWorkedHours).ToArray())
+            };
+
+        // Clear XAxisLabels before adding new values
+        XAxisLabels = new string[listSummaries.Count()];
+        for (int i = 0; i < listSummaries.Count(); i++)
+        {
+            XAxisLabels[i] = listSummaries.ElementAt(i).SummaryDate.ToString("dd/MM/yyyy");
+        }
+
+        Series.Add(series); // Add series to the chart
+        StateHasChanged();
+    }
+    public double[] convertShortArrayToDoubleArray(short?[] shortArray)
+    {
+        double[] doubleArray = new double[shortArray.Length];
+        for (int i = 0; i < shortArray.Length; i++)
+        {
+            doubleArray[i] = (double)(shortArray[i] ?? 0);
+        }
+        return doubleArray;
+    }
 
 }
+
+

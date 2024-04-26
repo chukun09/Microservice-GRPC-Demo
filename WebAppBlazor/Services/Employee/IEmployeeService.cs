@@ -8,5 +8,6 @@ namespace WebAppBlazor.Services.Employee
         Task<EmployeeEntity> AddAsync(EmployeeEntity entity);
         Task<EmployeeEntity> UpdateAsync(EmployeeEntity entity);
         Task<bool> DeleteAsync(string id);
+        Task<EmployeeEntity> GetEmployeeByUserId(string userId);
     }
 }

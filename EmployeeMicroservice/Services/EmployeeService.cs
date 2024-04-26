@@ -6,6 +6,7 @@ using Grpc.Core;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Service.Services.Employee.Employees;
+using static Grpc.Core.Metadata;
 
 namespace EmployeeMicroservice.Services
 {
@@ -84,9 +85,10 @@ namespace EmployeeMicroservice.Services
                         LastName = entity.LastName,
                         UserId = entity.UserId,
                         Address = entity.Address ?? "",
-                        DateOfBirth = entity.DateOfBirth == null ? null : Timestamp.FromDateTime((DateTime)entity.DateOfBirth),
+                        DateOfBirth = entity.DateOfBirth == null ? null : Timestamp.FromDateTime(entity.DateOfBirth.GetValueOrDefault().ToUniversalTime()),
                         DepartmentId = entity.DepartmentId ?? "",
                         Position = entity.Position ?? "",
+                        Department = entity.Department?.Name ?? ""
                     };
                     result.Employees.Add(reply);
                 }
@@ -119,6 +121,29 @@ namespace EmployeeMicroservice.Services
             {
                 Message = "Cập nhật thông tin thành công"
             });
+        }
+        /// <summary>
+        /// Get Employee By UserId
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public async override Task<EmployeeMessage> GetEmployeeByUserId(GetEmployeeByUserIdRequest request, ServerCallContext context)
+        {
+            var employee = await _mediator.Send(new GetEmployeeByUserIdQuery(request.UserId), context.CancellationToken);
+            return await Task.FromResult(new EmployeeMessage
+            {
+                Id = employee.Id,
+                FirstName = employee.FirstName,
+                LastName = employee.LastName,
+                UserId = employee.UserId,
+                Address = employee.Address ?? "",
+                DateOfBirth = employee.DateOfBirth == null ? null : Timestamp.FromDateTime(employee.DateOfBirth.GetValueOrDefault().ToUniversalTime()),
+                DepartmentId = employee.DepartmentId ?? "",
+                Position = employee.Position ?? "",
+                Department = employee.Department?.Name ?? ""
+            });
+            //return base.GetEmployeeByUserId(request, context);
         }
     }
 }

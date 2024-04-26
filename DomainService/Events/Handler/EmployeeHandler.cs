@@ -47,6 +47,23 @@ namespace DomainService.Events.Handler
         }
     }
     /// <summary>
+    /// Get By UserId
+    /// </summary>
+    public class GelByUserIdEmployeeHandler : IRequestHandler<GetEmployeeByUserIdQuery, EmployeeEntity>
+    {
+        private readonly IEmployeeService _service;
+
+        public GelByUserIdEmployeeHandler(IEmployeeService service)
+        {
+            _service = service;
+        }
+
+        public async Task<EmployeeEntity> Handle(GetEmployeeByUserIdQuery request, CancellationToken cancellationToken)
+        {
+            return await _service.FirstOrDefaultAsync(x => x.UserId == request.userId, cancellationToken);
+        }
+    }
+    /// <summary>
     /// Add User Employee Handler Command
     /// </summary>
     public class AddUserEmployeeHandler : BaseHandler<AddEmployeeCommand, EmployeeEntity, IEmployeeService>

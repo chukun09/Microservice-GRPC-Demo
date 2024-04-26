@@ -9,5 +9,6 @@ namespace DomainService.Services.AttendanceService
 {
     public interface IAttendanceService : IBaseService<AttendanceEntity>
     {
+        Task<List<AttendanceEntity>> GetAllAttandanceByEmployeeIdAsync(string employeeId, CancellationToken ct);
     }
 }

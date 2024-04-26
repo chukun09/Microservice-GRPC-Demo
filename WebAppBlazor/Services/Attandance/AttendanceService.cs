@@ -3,8 +3,9 @@ using Core.Entites;
 using Google.Protobuf.WellKnownTypes;
 using Google.Type;
 using Grpc.Core;
+using System.Linq.Expressions;
 
-namespace WebAppBlazor.Services.Attandance
+namespace WebAppBlazor.Services.Attendance
 {
     public class AttendanceService : IAttendanceService
     {
@@ -22,7 +23,7 @@ namespace WebAppBlazor.Services.Attandance
             {
                 CheckinTime = entity.CheckinTime.ToUniversalTime().ToTimestamp(),
                 CheckoutTime = entity.CheckoutTime.GetValueOrDefault().ToUniversalTime().ToTimestamp(),
-                Date = entity.Date.ToDateTime(TimeOnly.MinValue).ToUniversalTime().ToTimestamp(),
+                Date = entity.Date.ToDateTime(TimeOnly.FromDateTime(System.DateTime.Now.AddHours(7))).ToUniversalTime().ToTimestamp(),
                 EmployeeId = entity.EmployeeId,
             };
             _ = await _attendanceClient.AddAttendanceAsync(attendanceRequest);
@@ -37,6 +38,33 @@ namespace WebAppBlazor.Services.Attandance
             };
             _ = await _attendanceClient.DeleteAttendanceAsync(deleteRequest);
             return true;
+        }
+
+        public async Task<AttendanceEntity> GetAttendanceByEmployeeIdAsync(string employeeId)
+        {
+            var getAttendanceByEmployeeRequest = new GetAttendanceByEmployeeIdRequest()
+            {
+                EmployeeId = employeeId
+            };
+            var attendance = await _attendanceClient.GetAttendanceByEmployeeIdAsync(getAttendanceByEmployeeRequest);
+            switch (attendance.AttendanceCase)
+            {
+                case GetAttendanceByEmployeeIdResponse.AttendanceOneofCase.Empty:
+                    return null;
+                    break;
+                case GetAttendanceByEmployeeIdResponse.AttendanceOneofCase.Result:
+                    var result = new AttendanceEntity()
+                    {
+                        Id = attendance.Result.Id,
+                        EmployeeId = attendance.Result.EmployeeId,
+                        Date = DateOnly.FromDateTime(attendance.Result.Date.ToDateTime()),
+                        CheckinTime = attendance.Result.CheckinTime.ToDateTime().AddHours(7),
+                        CheckoutTime = attendance.Result.CheckoutTime.ToDateTime().AddHours(7),
+                    };
+                    return result;
+                    break;
+            }
+            return null;
         }
 
         public async Task<IEnumerable<AttendanceEntity>> GetAllAsync()
@@ -78,9 +106,9 @@ namespace WebAppBlazor.Services.Attandance
             var attendanceUpdateEntity = new AttendanceMessage
             {
                 Id = entity.Id,
-                CheckinTime = Timestamp.FromDateTime(entity.CheckinTime),
-                CheckoutTime = entity.CheckoutTime == null ? null : Timestamp.FromDateTime((System.DateTime)entity.CheckoutTime),
-                Date = entity.Date.ToDateTime(TimeOnly.MinValue).ToUniversalTime().ToTimestamp(),
+                CheckinTime = entity.CheckinTime.ToTimestamp(),
+                CheckoutTime = entity.CheckoutTime.GetValueOrDefault().ToUniversalTime().ToTimestamp(),
+                Date = entity.Date.ToDateTime(TimeOnly.FromDateTime(System.DateTime.Now.AddHours(7))).ToUniversalTime().ToTimestamp(),
                 EmployeeId = entity.EmployeeId,
 
             };
@@ -90,6 +118,26 @@ namespace WebAppBlazor.Services.Attandance
             };
             await _attendanceClient.UpdateAttendanceAsync(attendanceInput);
             return entity;
+        }
+
+        public async Task<List<AttendanceEntity>> GetAllAttendanceByEmployeeIdAsync(string employeeId)
+        {
+            var attendances = await _attendanceClient.GetAllAttendanceByEmployeeIdAsync(new GetAttendanceByEmployeeIdRequest() { EmployeeId = employeeId });
+            var result = new List<AttendanceEntity>();
+            foreach (var attendance in attendances.Attendances)
+            {
+                var mappingAttendance = new AttendanceEntity()
+                {
+                    Id = attendance.Id,
+                    EmployeeId = attendance.EmployeeId,
+                    Date = DateOnly.FromDateTime(attendance.Date.ToDateTime().AddHours(7)),
+                    CheckinTime = attendance.CheckinTime.ToDateTime().AddHours(7),
+                    CheckoutTime = attendance.CheckoutTime.ToDateTime().AddHours(7),
+                };
+                result.Add(mappingAttendance);
+
+            }
+            return result;
         }
     }
 }

@@ -23,6 +23,7 @@ service Employeer {
 	// Get all employee
 	rpc GetAllEmployee (stream Empty) returns (stream GetAllEmployeeReply){
 	};
+	rpc GetEmployeeByUserId(GetEmployeeByUserIdRequest) returns (EmployeeMessage);
 }
 	message EmployeeRequest {
 	EmployeeMessage employee = 1;
@@ -45,6 +46,7 @@ message EmployeeMessage {
   string lastName = 4;
   string address = 5;
   string departmentId = 6;
+  string department = 9;
   string position = 7;
   google.protobuf.Timestamp dateOfBirth = 8;
 }
@@ -60,6 +62,9 @@ message GetAllEmployeeReply {
 	repeated EmployeeMessage employees = 1;
 }
 
+message GetEmployeeByUserIdRequest {
+	string userId = 1;
+}
 message Empty {
 
 }

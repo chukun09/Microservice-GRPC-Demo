@@ -12,15 +12,12 @@ namespace Core.Entites
     [Table("Employees")]
     public class EmployeeEntity : BaseEntity
     {
-        public EmployeeEntity()
-        {
-        }
-
         public required string UserId { get; set; }
         [Required]
         public required string FirstName { get; set; }
         [Required]
         public required string LastName { get; set; }
+        [Required]
         public DateTime? DateOfBirth { get; set; }
         public string? Address { get; set; }
         public string? Position { get; set; }

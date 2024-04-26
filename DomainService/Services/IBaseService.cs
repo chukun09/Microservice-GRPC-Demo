@@ -16,5 +16,6 @@ namespace DomainService.Services
         Task<T> CreateAsync(T entity, CancellationToken ct);
         Task<T> UpdateAsync(T entity, CancellationToken ct);
         Task DeleteAsync(Guid id, CancellationToken ct);
+        Task<T> FirstOrDefaultAsync(Expression<Func<T, bool>> expression, CancellationToken ct);
     }
 }

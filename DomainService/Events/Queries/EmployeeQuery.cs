@@ -10,5 +10,7 @@ namespace DomainService.Events.Queries
 {
     public record GetAllEmployeeQuery : IRequest<List<EmployeeEntity>>;
     public record GetEmployeeByIdQuery(Guid id) : IRequest<EmployeeEntity>;
+    public record GetEmployeeByUserIdQuery(string userId) : IRequest<EmployeeEntity>;
+
 }
 

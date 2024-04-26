@@ -49,9 +49,14 @@ namespace Service.Services.Employee.Employees
             throw new CustomException("Id not match with any information, please check again");
         }
 
+        public async Task<EmployeeEntity> FirstOrDefaultAsync(Expression<Func<EmployeeEntity, bool>> expression, CancellationToken ct)
+        {
+            return await _unitOfWork.EmployeeRepository.FirstOrDefaultAsync(expression);
+        }
+
         public async Task<List<EmployeeEntity>> GetAsync(CancellationToken ct)
         {
-            var results = await _unitOfWork.EmployeeRepository.GetAllAsync();
+            var results = await _unitOfWork.EmployeeRepository.GetAllAsync(includes: new List<string>() { "Department" });
 
             // Check that we actually got some employees from the database
             if (results == null || results.Count() == 0)

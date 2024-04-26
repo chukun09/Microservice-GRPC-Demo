@@ -28,8 +28,12 @@ namespace DomainService.Events.Notifications
                 EmployeeId = attendance.EmployeeId
             };
             {
-                _logger.LogInformation($"Publishing attendance created event to message bus service for employee: {attendanceCreatedEvent.EmployeeId}");
-                await _publisher.Publish(attendanceCreatedEvent, cancellationToken);
+                if (attendance.CheckoutTime != null && attendance.CheckoutTime != DateTime.MinValue)
+                {
+                    _logger.LogInformation($"Publishing attendance created event to message bus service for employee: {attendanceCreatedEvent.EmployeeId}");
+                    await _publisher.Publish(attendanceCreatedEvent, cancellationToken);
+
+                }
                 //throw new NotImplementedException();
             }
         }

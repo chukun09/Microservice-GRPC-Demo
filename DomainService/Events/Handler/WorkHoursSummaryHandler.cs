@@ -28,6 +28,22 @@ namespace DomainService.Events.Handler
         {
             return await _service.GetAsync(cancellationToken);
         }
+    }    /// <summary>
+         /// Get All WorkHoursSummary By EmployeeId
+         /// </summary>
+    public class GelAllWorkHoursSummaryByEmployeeIdHandler : IRequestHandler<GetAllWorkHoursSummaryByEmployeeIdQuery, List<WorkHoursSummaryEntity>>
+    {
+        private readonly IWorkHoursSummaryService _service;
+
+        public GelAllWorkHoursSummaryByEmployeeIdHandler(IWorkHoursSummaryService service)
+        {
+            _service = service;
+        }
+
+        public async Task<List<WorkHoursSummaryEntity>> Handle(GetAllWorkHoursSummaryByEmployeeIdQuery request, CancellationToken cancellationToken)
+        {
+            return await _service.GetAllWorkHoursSummaryEntityIdAsync(request.employeeId, cancellationToken);
+        }
     }
     /// <summary>
     /// Get By Id

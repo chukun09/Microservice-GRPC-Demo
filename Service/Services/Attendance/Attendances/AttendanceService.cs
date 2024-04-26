@@ -41,6 +41,26 @@ namespace Service.Services.Attendance.Attendances
             throw new CustomException("Id not match with any information, please check again");
         }
 
+        public async Task<AttendanceEntity> FirstOrDefaultAsync(Expression<Func<AttendanceEntity, bool>> expression, CancellationToken ct)
+        {
+            return await _unitOfWork.AttendanceRepository.FirstOrDefaultAsync(expression);
+        }
+
+        public async Task<List<AttendanceEntity>> GetAllAttandanceByEmployeeIdAsync(string employeeId, CancellationToken ct)
+        {
+            var results = await _unitOfWork.AttendanceRepository.GetAllAsync(x => x.EmployeeId == employeeId, orderBy: x => x.OrderByDescending(c => c.Date));
+
+            //// Check that we actually got some employees from the database
+            //if (results == null || results.Count() == 0)
+            //{
+            //    // No employees were available in the database
+            //    throw new KeyNotFoundException("There are no records in the database. Please add one or more employees and try again.");
+            //}
+
+            // We got 1 or more employees to return
+            return new List<AttendanceEntity>(results);
+        }
+
         public async Task<List<AttendanceEntity>> GetAsync(CancellationToken ct)
         {
             var results = await _unitOfWork.AttendanceRepository.GetAllAsync();

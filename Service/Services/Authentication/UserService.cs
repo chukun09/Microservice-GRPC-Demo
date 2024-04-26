@@ -138,7 +138,7 @@ namespace Service.Services.Authentication
                 // we convert the expiry date from seconds to the date
                 var expDate = ObjectHelper.UnixTimeStampToDateTime(utcExpiryDate);
 
-                if (expDate < DateTime.UtcNow) throw new CustomException("We cannot refresh this since the token has not expired", 400);
+                if (expDate.AddHours(6) < DateTime.UtcNow) throw new CustomException("We cannot refresh this since the token has not expired", 400);
 
                 // Check the token we got if its saved in the db
                 var storedRefreshToken = await _dbContext.RefreshTokenEntities.FirstOrDefaultAsync(x => x.Token == input.RefreshToken);

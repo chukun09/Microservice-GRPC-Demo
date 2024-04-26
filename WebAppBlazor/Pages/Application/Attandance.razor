@@ -1,7 +1,99 @@
-﻿@page "/attandance"
+﻿@page "/attendance"
+@using Blazored.LocalStorage
+@using Core.Entites
+@using AttendanceMicroservice
+@using WebAppBlazor.Helper
+@using WebAppBlazor.Services.Attendance
+@using WebAppBlazor.Shared.Components
 @attribute [Authorize]
-<h3>Attandance</h3>
+@inject IJSRuntime JSRuntime
+@inject IAttendanceService _attendanceService;
+@inject SweetAlertService Swal;
+@inject ILocalStorageService _localStorage;
+
+<h1>Attendance</h1>
+<MudTable ServerData="@(new Func<TableState, Task<TableData<AttendanceEntity>>>(ServerReload))" T="AttendanceEntity"
+          Hover="true" @ref="table" MultiSelection="true" SelectedItemsChanged="OnSelectedItemsChanged" Comparer="Comparer">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Table Attendances</MudText>
+        <MudSpacer />
+        <MudTextField T="string" ValueChanged="@(s=>OnSearch(s))" Placeholder="Search" Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Date</MudTh>
+        <MudTh>Checked In Time</MudTh>
+        <MudTh>Checked Out Time</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Date">@context.Date.ToString("dd/MM/yyyy")</MudTd>
+        <MudTd DataLabel="Check In Time">@context.CheckinTime.ToString("dd/MM/yyyy HH:mm:ss")</MudTd>
+        <MudTd DataLabel="Check Out Time">@(context.CheckoutTime != null && context.CheckoutTime.GetValueOrDefault().AddHours(-7) != DateTime.MinValue ? context.CheckoutTime.Value.ToString("dd/MM/yyyy HH:mm:ss") : "No Checked Out")</MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText>No matching records found</MudText>
+    </NoRecordsContent>
+    <LoadingContent>
+        <MudText>Loading...</MudText>
+    </LoadingContent>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
 
 @code {
+    private IEnumerable<AttendanceEntity> pagedData;
+    private MudTable<AttendanceEntity> table;
+    private ElementComparer Comparer = new();
+    private int totalItems;
+    private string searchString = null;
+    private AttendanceEntity selectedAttendance;
+    private Modal modal { get; set; }
+    private bool isSingleSelected = false;
 
+    private void OnSelectedItemsChanged(HashSet<AttendanceEntity> elements)
+    {
+        if (elements.Count == 1)
+        {
+            isSingleSelected = true;
+            selectedAttendance = elements.First();
+        }
+        else
+        {
+            selectedAttendance = new AttendanceEntity();
+            isSingleSelected = false;
+        }
+    }
+    private async Task<TableData<AttendanceEntity>> ServerReload(TableState state)
+    {
+        var employeeId = await _localStorage.GetItemAsync<string>("employeeId");
+        IEnumerable<AttendanceEntity> data = await _attendanceService.GetAllAttendanceByEmployeeIdAsync(employeeId);
+        await Task.Delay(300);
+        data = data.Where(element =>
+        {
+            if (string.IsNullOrWhiteSpace(searchString))
+                return true;
+            if (element.Date.ToString("dd/MM/yyyy").Contains(searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+            return false;
+        }).ToArray();
+        totalItems = data.Count();
+
+        pagedData = data.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();
+        return new TableData<AttendanceEntity>() { TotalItems = totalItems, Items = pagedData };
+    }
+
+    private void OnSearch(string text)
+    {
+        searchString = text;
+        table.ReloadServerData();
+        table.SelectedItems = null;
+    }
+
+
+    class ElementComparer : IEqualityComparer<AttendanceEntity>
+    {
+        public bool Equals(AttendanceEntity a, AttendanceEntity b) => a?.Id == b?.Id;
+        public int GetHashCode(AttendanceEntity x) => HashCode.Combine(x?.Id);
+    }
 }

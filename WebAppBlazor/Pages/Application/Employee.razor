@@ -1,34 +1,25 @@
 ﻿@page "/employee"
 @using Core.Entites
 @using EmployeeMicroservice
+@using WebAppBlazor.Services.Department
 @using WebAppBlazor.Services.Employee
 @using WebAppBlazor.Shared.Components
 @attribute [Authorize]
 @inject IJSRuntime JSRuntime
 @inject IEmployeeService _employeeService;
+@inject IDepartmentService _departmentService;
 @inject SweetAlertService Swal;
 
-<style>
-    .modal {
-        transition: opacity 0.3s ease-in-out;
-    }
-
-        .modal.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-</style>
 <h1>Employee</h1>
 <div class="d-flex justify-content-end m-3">
     <ul class="list-inline m-0">
         <li class="list-inline-item">
-            <button class="btn btn-sm btn-info" disabled="@(isMultipleSelected)" type="button" @onclick="openEditModal" data-placement="top" title="Edit">
+            <button class="btn btn-sm btn-primary" disabled="@(!isSingleSelected)" type="button" @onclick="openEditModal" data-placement="top" title="Edit">
                 <img src="/images/icon-edit.svg" height="16px" /> Edit
             </button>
         </li>
         <li class="list-inline-item">
-            <button class="btn btn-sm btn-info" type="button" @onclick="Delete" data-placement="top" title="Delete">
+            <button class="btn btn-sm btn-danger" type="button" @onclick="Delete" disabled="@(!table?.SelectedItems?.Any() ?? true)" data-placement="top" title="Delete">
                 <img src="/images/icon-delete.svg" height="16px" /> Delete
             </button>
         </li>
@@ -38,7 +29,7 @@
 <MudTable ServerData="@(new Func<TableState, Task<TableData<EmployeeEntity>>>(ServerReload))" T="EmployeeEntity"
           Hover="true" @ref="table" MultiSelection="true" SelectedItemsChanged="OnSelectedItemsChanged" Comparer="Comparer">
     <ToolBarContent>
-        <MudText Typo="Typo.h6">Periodic Employees</MudText>
+        <MudText Typo="Typo.h6">Table Employees</MudText>
         <MudSpacer />
         <MudTextField T="string" ValueChanged="@(s=>OnSearch(s))" Placeholder="Search" Adornment="Adornment.Start"
                       AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
@@ -47,6 +38,7 @@
         <MudTh>First Name</MudTh>
         <MudTh>Last Name</MudTh>
         <MudTh>Position</MudTh>
+        <MudTh>Department</MudTh>
         <MudTh>Address</MudTh>
         <MudTh>Date Of Birth</MudTh>
     </HeaderContent>
@@ -54,6 +46,7 @@
         <MudTd DataLabel="First Name">@context.FirstName</MudTd>
         <MudTd DataLabel="Last Name">@context.LastName</MudTd>
         <MudTd DataLabel="Position">@context.Position</MudTd>
+        <MudTd DataLabel="Position">@context.Department?.Name</MudTd>
         <MudTd DataLabel="Adress">@context?.Address</MudTd>
         <MudTd DataLabel="Date Of Birth">@context.DateOfBirth.GetValueOrDefault().ToString("dd-MM-yyyy")</MudTd>
     </RowTemplate>
@@ -71,31 +64,50 @@
 <Modal @ref="modal">
     <Title>Employee Modal</Title>
     <Body>
-        <EditForm Model="@modalEmployee" OnValidSubmit="SaveEmployee">
+        <EditForm Model="@employeeModel" OnValidSubmit="SaveEmployeeEntity">
             <DataAnnotationsValidator />
             <ValidationSummary />
             <div class="mb-3">
                 <label for="firstName" class="form-label">First Name</label>
-                <InputText type="text" class="form-control" id="firstName" @bind-Value="modalEmployee.FirstName" placeholder="First Name" />
+                <InputText type="text" class="form-control" id="firstName" @bind-Value="employeeModel.FirstName" placeholder="First Name" />
             </div>
             <div class="mb-3">
                 <label for="lastName" class="form-label">Last Name</label>
-                <InputText type="text" class="form-control" id="lastName" @bind-Value="modalEmployee.LastName" placeholder="Last Name" />
+                <InputText type="text" class="form-control" id="lastName" @bind-Value="employeeModel.LastName" placeholder="Last Name" />
             </div>
             <div class="mb-3">
                 <label for="address" class="form-label">Address</label>
-                <InputText type="text" class="form-control" id="address" @bind-Value="modalEmployee.Address" placeholder="Address" />
+                <InputText type="text" class="form-control" id="address" @bind-Value="employeeModel.Address" placeholder="Address" />
             </div>
             <div class="mb-3">
                 <label for="position" class="form-label">Position</label>
-                <InputText class="form-control" id="position" @bind-Value="modalEmployee.Position" />
+                <InputText class="form-control" id="position" @bind-Value="employeeModel.Position" />
+
+            </div>
+            <div class="mb-3">
+                <label for="department" class="form-label">Department</label>
+                <InputSelect class="form-select" @bind-Value="employeeModel.DepartmentId" id="department">
+                    @foreach (var department in departmentsList)
+                    {
+                        <option value="@department.Id">@department.Name</option>
+                    }
+                </InputSelect>
+            </div>
+            <div class="mb-3">
+                <label for="dateOfBirth" class="form-label">Date of Birth</label>
+                <InputDate @bind-Value="employeeModel.DateOfBirth" id="dateOfBirth" class="form-control" />
+            </div>
+            <hr />
+            <div class="d-flex justify-content-end m-3">
+                <button type="submit" class="btn btn-primary me-3">Save changes</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="() => modal.Close()">Close</button>
             </div>
         </EditForm>
     </Body>
-    <Footer>
-        <button type="button" class="btn btn-primary" @onclick="SaveEmployeeEntity">Save changes</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="() => modal.Close()">Close</button>
-    </Footer>
+    @*     <Footer>
+    <button type="button" class="btn btn-primary" @onclick="SaveEmployeeEntity">Save changes</button>
+    <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="() => modal.Close()">Close</button>
+    </Footer> *@
 </Modal>
 @code {
     private IEnumerable<EmployeeEntity> pagedData;
@@ -104,26 +116,26 @@
     private int totalItems;
     private string searchString = null;
     private EmployeeEntity selectedEmployee;
-    private EmployeeEntity modalEmployee = new EmployeeEntity()
+    private IEnumerable<DepartmentEntity> departmentsList = new List<DepartmentEntity>();
+    private EmployeeEntity employeeModel = new EmployeeEntity()
         {
             UserId = "",
             FirstName = "",
             LastName = ""
         };
     private Modal modal { get; set; }
-    private bool isMultipleSelected = false;
-    private void SaveEmployee()
-    {
-        // Implement logic to save the modalEmployee object
-        // For example, you can call a method in a service to save the employee data
+    private bool isSingleSelected = false;
 
-        modal.Close(); // Close the modal after saving
+
+    protected override async void OnInitialized()
+    {
+        departmentsList = await _departmentService.GetAllAsync();
     }
     private void OnSelectedItemsChanged(HashSet<EmployeeEntity> elements)
     {
         if (elements.Count == 1)
         {
-            isMultipleSelected = false;
+            isSingleSelected = true;
             selectedEmployee = elements.First();
         }
         else
@@ -134,17 +146,29 @@
                     FirstName = "",
                     LastName = ""
                 }; ;
-            isMultipleSelected = true;
+            isSingleSelected = false;
         }
     }
     private async Task openCreateModal()
     {
-        modalEmployee = null;
+        employeeModel = null;
         await modal.Open();
     }
     private async Task openEditModal()
     {
-        modalEmployee = selectedEmployee;
+        employeeModel = new EmployeeEntity()
+            {
+                FirstName = selectedEmployee.FirstName,
+                LastName = selectedEmployee.LastName,
+                UserId = selectedEmployee.UserId,
+                Address = selectedEmployee.Address,
+                DateOfBirth = selectedEmployee.DateOfBirth,
+                Position = selectedEmployee.Position,
+                Id = selectedEmployee.Id,
+                Department = selectedEmployee.Department,
+                DepartmentId = selectedEmployee.DepartmentId
+
+            };
         await modal.Open();
     }
     private async Task Delete()
@@ -152,7 +176,7 @@
         SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
             {
                 Title = "Are you sure?",
-                Text = "You will not be able to recover this imaginary file!",
+                Text = "You will not be able to recover this record!",
                 Icon = SweetAlertIcon.Warning,
                 ShowCancelButton = true,
                 ConfirmButtonText = "Yes, delete it!",
@@ -164,11 +188,12 @@
             await _employeeService.DeleteAsync(selectedEmployee.Id);
             await Swal.FireAsync(
                 "Deleted",
-                "Your imaginary file has been deleted.",
+                "Your record has been deleted.",
                SweetAlertIcon.Success
                 );
             await Task.Delay(300);
             await table.ReloadServerData();
+            table.SelectedItems = null;
         }
         else if (result.Dismiss == DismissReason.Cancel)
         {
@@ -230,16 +255,18 @@
     {
         searchString = text;
         table.ReloadServerData();
+        table.SelectedItems = null;
     }
 
 
     async Task SaveEmployeeEntity()
     {
-        var result = await _employeeService.UpdateAsync(modalEmployee);
-        Swal.FireAsync("Update Employee", "Update Employee Succesful", SweetAlertIcon.Success);
-        modal.Close();
+        var result = await _employeeService.UpdateAsync(employeeModel);
+        await Swal.FireAsync("Update Employee", "Update Employee Succesful", SweetAlertIcon.Success);
+        await modal.Close();
+        await Task.Delay(300);
+        table.ReloadServerData();
         table.SelectedItems = null;
-        StateHasChanged();
     }
 
     class ElementComparer : IEqualityComparer<EmployeeEntity>
