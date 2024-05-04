@@ -26,6 +26,7 @@ namespace DomainService.Events.Handler
         public async Task<UserEntity> Handle(AddUserCommand request, CancellationToken cancellationToken)
         {
             var result = await _userService.SignUpAsync(request.input, cancellationToken);
+            await _mediator.Publish(new UserLoggedinNotification(result), cancellationToken);
             return result;
         }
     }
@@ -46,7 +47,15 @@ namespace DomainService.Events.Handler
         public async Task<SignInResult> Handle(SignInCommand request, CancellationToken cancellationToken)
         {
             var result = await _userService.SignInAsync(request.input);
-            await _mediator.Publish(new UserLoggedinNotification(result), cancellationToken);
+            var input = new UserEntity()
+            {
+                FirstName = result.FirstName,
+                LastName = result.LastName,
+                UserName = result.UserName,
+                Id = result.UserId,
+            };
+            //await _mediator.Publish(new UserLoggedinNotification(input), cancellationToken);
+
             return result;
         }
     }

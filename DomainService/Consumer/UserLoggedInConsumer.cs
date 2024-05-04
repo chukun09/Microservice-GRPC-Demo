@@ -24,7 +24,6 @@ namespace DomainService.Consumer
             var employee = await _employeeService.GetByConditionAsync(x => x.UserId == message.UserId, context.CancellationToken);
             if (employee == null)
             {
-
                 var newEmployee = new EmployeeEntity()
                 {
                     FirstName = message?.FirstName ?? "",

@@ -9,12 +9,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
+
 
 namespace DomainService.Configurations
 {
@@ -111,7 +107,7 @@ namespace DomainService.Configurations
 
             services.AddMassTransit(config =>
             {
-                //config.AddConsumer<UserAttendancedConsumer>();
+                config.AddConsumer<DeleteEmployeeConsumer>();
                 config.UsingRabbitMq((ctx, cfg) =>
                 {
                     cfg.Host(settings.Host, x =>
@@ -119,10 +115,10 @@ namespace DomainService.Configurations
                         x.Username(settings.Username);
                         x.Password(settings.Password);
                     });
-                    //cfg.ReceiveEndpoint(EventBusConstants.UserAttendancedEvent, c =>
-                    //{
-                    //    c.ConfigureConsumer<UserAttendancedConsumer>(ctx);
-                    //});
+                    cfg.ReceiveEndpoint(EventBusConstants.DeleteEmployeeEvent, c =>
+                    {
+                        c.ConfigureConsumer<DeleteEmployeeConsumer>(ctx);
+                    });
                 });
             });
 

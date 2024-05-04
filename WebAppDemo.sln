@@ -33,6 +33,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Data", "Data\Data.csproj", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Service", "Service\Service.csproj", "{AF3C6B2D-9369-4480-888D-EDBE659AB6FE}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiGatewayOcelot", "ApiGatewayOcelot\ApiGatewayOcelot.csproj", "{5CFAD00B-94CA-47F0-8D60-65F97DC6429F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebAppDemo.Tests", "WebAppDemo.Tests\WebAppDemo.Tests.csproj", "{9E542FAF-0CB6-4FF1-BEDB-9691F49D61E0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +79,14 @@ Global
 		{AF3C6B2D-9369-4480-888D-EDBE659AB6FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AF3C6B2D-9369-4480-888D-EDBE659AB6FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AF3C6B2D-9369-4480-888D-EDBE659AB6FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5CFAD00B-94CA-47F0-8D60-65F97DC6429F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5CFAD00B-94CA-47F0-8D60-65F97DC6429F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5CFAD00B-94CA-47F0-8D60-65F97DC6429F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5CFAD00B-94CA-47F0-8D60-65F97DC6429F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9E542FAF-0CB6-4FF1-BEDB-9691F49D61E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E542FAF-0CB6-4FF1-BEDB-9691F49D61E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E542FAF-0CB6-4FF1-BEDB-9691F49D61E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E542FAF-0CB6-4FF1-BEDB-9691F49D61E0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

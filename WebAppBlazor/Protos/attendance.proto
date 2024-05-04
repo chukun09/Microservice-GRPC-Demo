@@ -11,23 +11,35 @@ package attendance;
 service Attendancer {
 	rpc AddAttendance (AddAttendanceRequest) returns (AttendanceReply){
 	option (google.api.http) = {
-      post: "/v1/attendance/add-attendance",
+      post: "/v1/attendance/create",
 	  body: "*"
-    };
 	};
+    };
 	rpc UpdateAttendance (AttendanceRequest) returns (AttendanceReply){
 	option (google.api.http) = {
-      put: "/v1/attendance/add-attendance",
+      put: "/v1/attendance/update",
 	  body: "attendance"
-    };
 	};
-	rpc DeleteAttendance (DeleteAttendanceRequest) returns (AttendanceReply);
+    };
+	rpc DeleteAttendance (DeleteAttendanceRequest) returns (AttendanceReply){
+	option (google.api.http) = {
+      delete: "/v1/attendance/delete/{employeeId}"
+	};
+    };
 	// Get all attendance
 	rpc GetAllAttendance (stream Empty) returns (stream GetAllAttendanceReply){
 
 	};
-	rpc GetAllAttendanceByEmployeeId (GetAttendanceByEmployeeIdRequest) returns (GetAllAttendanceReply);
-	rpc GetAttendanceByEmployeeId (GetAttendanceByEmployeeIdRequest) returns (GetAttendanceByEmployeeIdResponse);
+	rpc GetAllAttendanceByEmployeeId (GetAttendanceByEmployeeIdRequest) returns (GetAllAttendanceReply){
+	option (google.api.http) = {
+      get: "/v1/attendance/get-all-by-employeeId/{employeeId}"
+	};
+    };
+	rpc GetAttendanceByEmployeeId (GetAttendanceByEmployeeIdRequest) returns (GetAttendanceByEmployeeIdResponse){
+	option (google.api.http) = {
+      get: "/v1/attendance/get-by-employeeId/{employeeId}"
+	};
+	};
 }
 
 

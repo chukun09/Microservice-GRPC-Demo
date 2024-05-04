@@ -83,9 +83,9 @@ namespace WebAppBlazor.Services.Attendance
                         {
                             Id = attendance.Id,
                             EmployeeId = attendance.EmployeeId,
-                            Date = DateOnly.FromDateTime(attendance.Date.ToDateTime()),
-                            CheckinTime = attendance.CheckinTime.ToDateTime(),
-                            CheckoutTime = attendance.CheckoutTime.ToDateTime(),
+                            Date = DateOnly.FromDateTime(attendance.Date.ToDateTime().AddHours(7)),
+                            CheckinTime = attendance.CheckinTime.ToDateTime().AddHours(7),
+                            CheckoutTime = attendance.CheckoutTime.ToDateTime().AddHours(7),
                         };
                         attendances.Add(mappingAttendance);
 

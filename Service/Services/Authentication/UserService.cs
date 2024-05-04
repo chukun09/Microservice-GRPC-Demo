@@ -16,22 +16,24 @@ using Data;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using DomainService.Services.AuthenticationService.Input;
+using Microsoft.AspNetCore.Http;
+using AutoMapper.Features;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Connections;
 
 namespace Service.Services.Authentication
 {
     public class UserService : IUserService
     {
-        private readonly IAuthenticationUnitOfWork _authenticationUnitOfWork;
         private readonly UserManager<UserEntity> _userManager;
         private readonly SignInManager<UserEntity> _signInManager;
         private readonly IConfiguration _config;
         private readonly AuthenticationDbContext _dbContext;
         //private readonly IMapper _mapper;
 
-        public UserService(IAuthenticationUnitOfWork authenticationUnitOfWork, UserManager<UserEntity> userManager, SignInManager<UserEntity> signInManager, IConfiguration config,
+        public UserService(UserManager<UserEntity> userManager, SignInManager<UserEntity> signInManager, IConfiguration config,
             AuthenticationDbContext dbContext)
         {
-            _authenticationUnitOfWork = authenticationUnitOfWork;
             _userManager = userManager;
             _signInManager = signInManager;
             _config = config;
@@ -197,7 +199,8 @@ namespace Service.Services.Authentication
 
                 // Step 5: Save changes to the database
                 await _dbContext.SaveChangesAsync(ct);
-                return newUser;
+                var result = await _signInManager.UserManager.FindByNameAsync(newUser.UserName);
+                return result;
             }
             else
             {
@@ -209,6 +212,12 @@ namespace Service.Services.Authentication
         public async Task<DomainService.AuthenticationService.Input.SignInResult> SignInAsync(SignInInput input)
         {
             var objUser = await _signInManager.UserManager.FindByNameAsync(input.Username);
+            var response = new HttpResponseFeature();
+
+            var features = new FeatureCollection();
+            features.Set<IHttpResponseFeature>(response);
+            var context = new DefaultHttpContext();
+
             if (objUser == null) throw new CustomException("Tài khoản không tồn tại trong hệ thống.", 400);
             //if (!objUser.IsActive) throw new CustomException("Tài khoản đang bị khóa.", 400);
             var rsSignIn = await _signInManager.PasswordSignInAsync(objUser, input.Password, input.IsRememberMe, lockoutOnFailure: false);

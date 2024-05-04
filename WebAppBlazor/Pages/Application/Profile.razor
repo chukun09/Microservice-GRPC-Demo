@@ -1,0 +1,102 @@
+﻿@page "/profile"
+@using Core.Entites
+@using WebAppBlazor.Services.Department
+@using WebAppBlazor.Services.Employee
+@attribute [Authorize]
+@inject IEmployeeService _employeeService;
+@inject IDepartmentService _departmentService;
+@inject SweetAlertService Swal;
+@inject AuthenticationStateProvider AuthenticationStateProvider;
+<h3>Profile</h3>
+
+<div class="row">
+    <div class="col-md-3 mb-4">
+        <div class="avatar-container d-flex justify-content-center">
+            <img src="/images/default_avatar.jpg" width="250px" alt="Avatar" class="avatar img-fluid rounded-circle" />
+        </div>
+    </div>
+    <div class="col-md-9">
+        <EditForm Model="@profile" OnValidSubmit="SaveProfile" class="profile-form">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="FirstName" class="form-label">First Name:</label>
+                        <InputText type="text" class="form-control" id="FirstName" @bind-Value="profile.FirstName" required />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="LastName" class="form-label">Last Name:</label>
+                        <InputText type="text" class="form-control" id="LastName" @bind-Value="profile.LastName" required />
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="DateOfBirth" class="form-label">Date of Birth:</label>
+                        <InputDate @bind-Value="profile.DateOfBirth" id="dateOfBirth" class="form-control" />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="Address" class="form-label">Address:</label>
+                        <InputText type="text" class="form-control" id="Address" @bind-Value="profile.Address" />
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="Position" class="form-label">Position:</label>
+                        <InputText type="text" class="form-control" id="Position" @bind-Value="profile.Position" />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="department" class="form-label">Department</label>
+                        <InputSelect class="form-control" @bind-Value="profile.DepartmentId" id="department">
+                            @foreach (var department in departmentsList)
+                            {
+                                <option value="@department.Id">@department.Name</option>
+                            }
+                        </InputSelect>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary ms-auto d-flex">Save</button>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private EmployeeEntity profile = new EmployeeEntity()
+        {
+            UserId = "",
+            FirstName = "",
+            LastName = ""
+        };
+    private IEnumerable<DepartmentEntity> departmentsList = new List<DepartmentEntity>();
+    protected override async void OnInitialized()
+    {
+        await InitProfile();
+    }
+    private async Task SaveProfile()
+    {
+        // Save profile logic goes here
+        var result = await _employeeService.UpdateAsync(profile);
+        await Swal.FireAsync("Update Profile", "Update Profile Succesful", SweetAlertIcon.Success);
+        await InitProfile();
+    }
+    private async Task InitProfile()
+    {
+        departmentsList = await _departmentService.GetAllAsync();
+        var checkUser = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var userId = checkUser.User.FindFirst("userId")?.Value ?? "";
+        profile = await _employeeService.GetEmployeeByUserId(userId);
+        StateHasChanged();
+    }
+
+}

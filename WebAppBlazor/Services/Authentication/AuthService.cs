@@ -39,8 +39,6 @@ namespace WebAppBlazor.Services.Authentication
                 UserName = registerModel.UserName,
             };
             _ = await _userClient.SignUpAsync(input);
-            //return response;
-            //var result = await _httpClient.PostJsonAsync<UserEntity>("api/accounts", registerModel);
         }
 
         public async Task<SignInResult> Login(SignInInput loginModel)

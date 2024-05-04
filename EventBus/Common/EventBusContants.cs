@@ -11,5 +11,6 @@ namespace EventBus.Common;
         public const string UserLoggedinEvent = "user-loggedin-event";
         public const string UserUpdatedEvent = "user-updated-event";
         public const string UserAttendancedEvent = "user-attendanced-event";
+        public const string DeleteEmployeeEvent = "delete-employee-event";
     }
 

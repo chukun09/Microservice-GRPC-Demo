@@ -2,44 +2,88 @@
 @using Blazored.LocalStorage
 @using Core.Entites
 @using AttendanceMicroservice
+@using System.Security.Claims
 @using WebAppBlazor.Helper
 @using WebAppBlazor.Services.Attendance
+@using WebAppBlazor.Services.Employee
 @using WebAppBlazor.Shared.Components
 @attribute [Authorize]
 @inject IJSRuntime JSRuntime
 @inject IAttendanceService _attendanceService;
+@inject IEmployeeService _employeeService;
 @inject SweetAlertService Swal;
 @inject ILocalStorageService _localStorage;
+@inject AuthenticationStateProvider AuthenticationStateProvider;
 
 <h1>Attendance</h1>
-<MudTable ServerData="@(new Func<TableState, Task<TableData<AttendanceEntity>>>(ServerReload))" T="AttendanceEntity"
-          Hover="true" @ref="table" MultiSelection="true" SelectedItemsChanged="OnSelectedItemsChanged" Comparer="Comparer">
-    <ToolBarContent>
-        <MudText Typo="Typo.h6">Table Attendances</MudText>
-        <MudSpacer />
-        <MudTextField T="string" ValueChanged="@(s=>OnSearch(s))" Placeholder="Search" Adornment="Adornment.Start"
-                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-    </ToolBarContent>
-    <HeaderContent>
-        <MudTh>Date</MudTh>
-        <MudTh>Checked In Time</MudTh>
-        <MudTh>Checked Out Time</MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="Date">@context.Date.ToString("dd/MM/yyyy")</MudTd>
-        <MudTd DataLabel="Check In Time">@context.CheckinTime.ToString("dd/MM/yyyy HH:mm:ss")</MudTd>
-        <MudTd DataLabel="Check Out Time">@(context.CheckoutTime != null && context.CheckoutTime.GetValueOrDefault().AddHours(-7) != DateTime.MinValue ? context.CheckoutTime.Value.ToString("dd/MM/yyyy HH:mm:ss") : "No Checked Out")</MudTd>
-    </RowTemplate>
-    <NoRecordsContent>
-        <MudText>No matching records found</MudText>
-    </NoRecordsContent>
-    <LoadingContent>
-        <MudText>Loading...</MudText>
-    </LoadingContent>
-    <PagerContent>
-        <MudTablePager />
-    </PagerContent>
-</MudTable>
+@if (!isAdmin)
+{
+    <MudTable ServerData="@(new Func<TableState, Task<TableData<AttendanceEntity>>>(ServerReload))" T="AttendanceEntity"
+              Hover="true" @ref="table" MultiSelection="true" SelectedItemsChanged="OnSelectedItemsChanged" Comparer="Comparer">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Table Attendances</MudText>
+            <MudSpacer />
+            <MudTextField T="string" ValueChanged="@(s=>OnSearch(s))" Placeholder="Search" Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Date</MudTh>
+            <MudTh>Checked In Time</MudTh>
+            <MudTh>Checked Out Time</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Date">@context.Date.ToString("dd/MM/yyyy")</MudTd>
+            <MudTd DataLabel="Check In Time">@context.CheckinTime.ToString("dd/MM/yyyy HH:mm:ss")</MudTd>
+            <MudTd DataLabel="Check Out Time">@(context.CheckoutTime != null && context.CheckoutTime.GetValueOrDefault().AddHours(-7) != DateTime.MinValue ? context.CheckoutTime.Value.ToString("dd/MM/yyyy HH:mm:ss") : "No Checked Out")</MudTd>
+        </RowTemplate>
+        <NoRecordsContent>
+            <MudText>No matching records found</MudText>
+        </NoRecordsContent>
+        <LoadingContent>
+            <MudText>Loading...</MudText>
+        </LoadingContent>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+}
+else
+{
+    <MudTable ServerData="@(new Func<TableState, Task<TableData<AttendanceEntity>>>(ServerReload))" T="AttendanceEntity"
+              Hover="true" @ref="table" MultiSelection="true" SelectedItemsChanged="OnSelectedItemsChanged" Comparer="Comparer">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Table Attendances</MudText>
+            <MudSpacer />
+            <MudTextField T="string" ValueChanged="@(s=>OnSearch(s))" Placeholder="Search" Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Employee</MudTh>
+            <MudTh>Date Of Birth</MudTh>
+            <MudTh>Department</MudTh>
+            <MudTh>Date</MudTh>
+            <MudTh>Checked In Time</MudTh>
+            <MudTh>Checked Out Time</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Employee">@(employeeDictionary.ContainsKey(@context.EmployeeId) ? employeeDictionary[@context.EmployeeId]?.FirstName + ' ' + employeeDictionary[@context.EmployeeId]?.LastName : "Không tồn tại")</MudTd>
+            <MudTd DataLabel="DateOfBirth">@employeeDictionary[@context.EmployeeId]?.DateOfBirth.GetValueOrDefault().ToString("dd/MM/yyyy")</MudTd>
+            <MudTd DataLabel="Department">@(employeeDictionary[@context.EmployeeId]?.Department?.Name ?? "Chưa có phòng ban")</MudTd>
+            <MudTd DataLabel="Date">@context.Date.ToString("dd/MM/yyyy")</MudTd>
+            <MudTd DataLabel="Check In Time">@context.CheckinTime.ToString("dd/MM/yyyy HH:mm:ss")</MudTd>
+            <MudTd DataLabel="Check Out Time">@(context.CheckoutTime != null && context.CheckoutTime.GetValueOrDefault().AddHours(-7) != DateTime.MinValue ? context.CheckoutTime.Value.ToString("dd/MM/yyyy HH:mm:ss") : "No Checked Out")</MudTd>
+        </RowTemplate>
+        <NoRecordsContent>
+            <MudText>No matching records found</MudText>
+        </NoRecordsContent>
+        <LoadingContent>
+            <MudText>Loading...</MudText>
+        </LoadingContent>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+}
 
 @code {
     private IEnumerable<AttendanceEntity> pagedData;
@@ -50,7 +94,17 @@
     private AttendanceEntity selectedAttendance;
     private Modal modal { get; set; }
     private bool isSingleSelected = false;
-
+    private bool isAdmin = false;
+    private IEnumerable<EmployeeEntity> listEmployees;
+    private Dictionary<string, EmployeeEntity> employeeDictionary;
+    protected override async Task OnInitializedAsync()
+    {
+        var checkRoleUser = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var isAdminClaims = checkRoleUser.User?.FindFirst("role")?.Value ?? "";
+        isAdmin = isAdminClaims.Contains("Admin");
+        listEmployees = await _employeeService.GetAllAsync();
+        employeeDictionary = listEmployees.ToDictionary(x => x.Id, x => x);
+    }
     private void OnSelectedItemsChanged(HashSet<AttendanceEntity> elements)
     {
         if (elements.Count == 1)
@@ -66,8 +120,16 @@
     }
     private async Task<TableData<AttendanceEntity>> ServerReload(TableState state)
     {
-        var employeeId = await _localStorage.GetItemAsync<string>("employeeId");
-        IEnumerable<AttendanceEntity> data = await _attendanceService.GetAllAttendanceByEmployeeIdAsync(employeeId);
+        IEnumerable<AttendanceEntity> data = new List<AttendanceEntity>();
+        if (!isAdmin)
+        {
+            var employeeId = await _localStorage.GetItemAsync<string>("employeeId");
+            data = await _attendanceService.GetAllAttendanceByEmployeeIdAsync(employeeId);
+        }
+        else
+        {
+            data = await _attendanceService.GetAllAsync();
+        }
         await Task.Delay(300);
         data = data.Where(element =>
         {

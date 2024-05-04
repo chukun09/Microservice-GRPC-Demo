@@ -68,11 +68,11 @@ var app = builder.Build();
 var dbInitService = app.Services.GetService<IDbInitializer>();
 if (dbInitService != null) await dbInitService.SeedUsers();
 // Use Swagger UI
-app.UseSwagger();
-app.UseSwaggerUI(c =>
-{
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-});
+//app.UseSwagger();
+//app.UseSwaggerUI(c =>
+//{
+//    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+//});
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();

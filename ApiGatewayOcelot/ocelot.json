@@ -1,0 +1,255 @@
+{
+  "GlobalConfiguration": {
+    "BaseUrl": "https://localhost:7131"
+  },
+  "Routes": [
+    // Authentication Gateway
+    {
+      "UpstreamPathTemplate": "/gateway/user/sign-in",
+      "UpstreamHttpMethod": [ "Post" ],
+      "DownstreamPathTemplate": "/v1/user/sign-in",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7051
+        }
+      ]
+    },
+    {
+      "UpstreamPathTemplate": "/gateway/user/sign-up",
+      "UpstreamHttpMethod": [ "Post" ],
+      "DownstreamPathTemplate": "/v1/user/sign-up",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7051
+        }
+      ]
+    },
+    {
+      "UpstreamPathTemplate": "/gateway/user/refresh-token",
+      "UpstreamHttpMethod": [ "Post" ],
+      "DownstreamPathTemplate": "/v1/user/refresh-token",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7051
+        }
+      ]
+    },
+    {
+      "UpstreamPathTemplate": "/gateway/user/sign-out",
+      "UpstreamHttpMethod": [ "Post" ],
+      "DownstreamPathTemplate": "/v1/user/sign-out",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7051
+        }
+      ]
+    },
+    /// Attendance Gateway
+    {
+      "DownstreamPathTemplate": "/v1/attendance/create",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7217
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/attendances/create",
+      "UpstreamHttpMethod": [ "Post" ]
+    },
+    {
+      "DownstreamPathTemplate": "/v1/attendance/update",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7217
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/attendances/update",
+      "UpstreamHttpMethod": [ "Put" ]
+    },
+    {
+      "DownstreamPathTemplate": "/v1/attendance/delete/{employeeId}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7217
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/attendances/delete/{employeeId}",
+      "UpstreamHttpMethod": [ "Delete" ]
+    },
+    {
+      "DownstreamPathTemplate": "/v1/attendance/get-all-by-employeeId/{employeeId}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7217
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/attendance/get-all-by-employeeId/{employeeId}",
+      "UpstreamHttpMethod": [ "Get" ]
+    },
+    {
+      "DownstreamPathTemplate": "/v1/attendance/get-by-employeeId/{employeeId}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7217
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/attendance/get-by-employeeId/{employeeId}",
+      "UpstreamHttpMethod": [ "Get" ]
+    },
+    /// Department Gateway
+    {
+      "DownstreamPathTemplate": "/v1/department/create",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7072
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/department/create",
+      "UpstreamHttpMethod": [ "Post" ]
+    },
+    {
+      "DownstreamPathTemplate": "/v1/department/update",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7072
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/department/update",
+      "UpstreamHttpMethod": [ "Put" ]
+    },
+    {
+      "DownstreamPathTemplate": "/v1/department/delete/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7072
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/department/delete/{id}",
+      "UpstreamHttpMethod": [ "Delete" ]
+    },
+    /// Employee Gateway
+    {
+      "DownstreamPathTemplate": "/v1/employee/create",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7072
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/employee/create",
+      "UpstreamHttpMethod": [ "Post" ]
+    },
+    {
+      "DownstreamPathTemplate": "/v1/employee/update",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7072
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/employee/update",
+      "UpstreamHttpMethod": [ "Put" ]
+    },
+    {
+      "DownstreamPathTemplate": "/v1/employee/delete/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7072
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/employee/delete/{id}",
+      "UpstreamHttpMethod": [ "Delete" ]
+    },
+    {
+      "DownstreamPathTemplate": "/v1/employee/get-by-userId/{userId}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7072
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/employee/get-by-userId/{userId}",
+      "UpstreamHttpMethod": [ "Get" ]
+    },
+    /// WorkHoursSummary Gateway
+    {
+      "DownstreamPathTemplate": "/v1/work-hours-summary/create",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7072
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/work-hours-summary/create",
+      "UpstreamHttpMethod": [ "Post" ]
+    },
+    {
+      "DownstreamPathTemplate": "/v1/work-hours-summary/update",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7072
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/work-hours-summary/update",
+      "UpstreamHttpMethod": [ "Put" ]
+    },
+    {
+      "DownstreamPathTemplate": "/v1/work-hours-summary/delete/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7072
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/work-hours-summary/delete/{id}",
+      "UpstreamHttpMethod": [ "Delete" ]
+    },
+    {
+      "DownstreamPathTemplate": "/v1/work-hours-summary/get-by-employeeId/{employeeId}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7072
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/work-hours-summary/get-by-employeeId/{employeeId}",
+      "UpstreamHttpMethod": [ "Get" ]
+    }
+  ],
+  "AuthenticationOptions": {
+    "AuthenticationProviderKey": "Bearer"
+  }
+}

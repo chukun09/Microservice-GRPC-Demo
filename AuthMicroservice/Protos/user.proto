@@ -9,10 +9,29 @@ package user;
 
 service Userer
 {
-	rpc SignIn(SignInRequest) returns (SignInReply);
-	rpc SignUp(SignUpRequest) returns (UserInformation);
-	rpc RefreshToken(RefreshTokenRequest) returns (SignInReply);
-	rpc SignOut(Empty) returns (Empty);
+	rpc SignIn(SignInRequest) returns (SignInReply){
+	option (google.api.http) = {
+      post: "/v1/user/sign-in",
+	  body: "*"
+	  };
+    };
+	rpc SignUp(SignUpRequest) returns (UserInformation){
+	option (google.api.http) = {
+      post: "/v1/user/sign-up",
+	  body: "*"
+	};
+    };
+	rpc RefreshToken(RefreshTokenRequest) returns (SignInReply){
+	option (google.api.http) = {
+      post: "/v1/user/refresh-token",
+	  body: "*"
+	  };
+    };
+	rpc SignOut(Empty) returns (Empty){
+	option (google.api.http) = {
+      post: "/v1/user/sign-out",
+	  };
+    };;
 }
 
 message SignInRequest {

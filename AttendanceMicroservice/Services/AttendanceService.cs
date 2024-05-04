@@ -64,7 +64,7 @@ namespace AttendanceMicroservice.Services
                     {
                         Id = entity.Id,
                         CheckinTime = Timestamp.FromDateTime(entity.CheckinTime),
-                        CheckoutTime = entity.CheckoutTime == null ? null : Timestamp.FromDateTime((DateTime)entity.CheckoutTime),
+                        CheckoutTime = Timestamp.FromDateTime(entity.CheckoutTime.GetValueOrDefault().ToUniversalTime()),
                         Date = entity.Date.ToDateTime(TimeOnly.MinValue).ToUniversalTime().ToTimestamp(),
                         EmployeeId = entity.EmployeeId,
                     };

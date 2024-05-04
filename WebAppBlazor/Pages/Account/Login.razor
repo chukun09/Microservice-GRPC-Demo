@@ -7,7 +7,6 @@
 @inject IAuthService AuthService
 @inject NavigationManager NavigationManager
 @inject SweetAlertService Swal;
-@inject LoginState LoginState;
 @attribute [AllowAnonymous]
 
 
@@ -78,7 +77,6 @@
             await Swal.FireAsync("Errors", ex.Status.Detail, "error");
             return;
         }
-        LoginState.LoggedIn = true;
         NavigationManager.NavigateTo("/");
 
 

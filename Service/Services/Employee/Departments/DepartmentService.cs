@@ -24,9 +24,9 @@ namespace Service.Services.Department.Departments
 
         public async Task<DepartmentEntity> CreateAsync(DepartmentEntity entity, CancellationToken ct)
         {
-            await _unitOfWork.DepartmentRepository.InsertAsync(entity);
+           var result = await _unitOfWork.DepartmentRepository.InsertAsync(entity);
             await _unitOfWork.SaveChangesAsync(ct);
-            return entity;
+            return result;
         }
 
         public async Task DeleteAsync(Guid id, CancellationToken ct)

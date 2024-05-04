@@ -22,6 +22,7 @@ namespace AuthMicroservice.Services
         /// <param name="request"></param>
         /// <param name="context"></param>
         /// <returns></returns>
+        ///
         public override async Task<UserInformation> SignUp(SignUpRequest request, ServerCallContext context)
         {
             var signUpInformation = new SignUpInput()

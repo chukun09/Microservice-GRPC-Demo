@@ -24,15 +24,13 @@ namespace DomainService.Events.Notifications
 
         public async Task Handle(UserLoggedinNotification notification, CancellationToken cancellationToken)
         {
-            var signInResult = notification.signInResult;
+            var signInResult = notification.user;
             var loggedInEvent = new UserLoggedInEvent()
             {
-                UserId = signInResult.UserId,
-                AccessToken = signInResult.AccessToken,
-                RefreshToken = signInResult.RefreshToken,
-                UserName = signInResult.UserName,
-                FirstName = signInResult.FirstName,
-                LastName = signInResult.LastName,
+                UserId = signInResult.Id,
+                UserName = signInResult?.UserName ?? "",
+                FirstName = signInResult?.FirstName ?? "",
+                LastName = signInResult?.LastName ?? "",
             };
             _logger.LogInformation($"User Signed In to System: {loggedInEvent.UserId} {loggedInEvent.UserName}");
             await _publisher.Publish(loggedInEvent, cancellationToken);

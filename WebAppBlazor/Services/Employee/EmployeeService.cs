@@ -117,7 +117,7 @@ namespace WebAppBlazor.Services.Employee
                 Position = entity.Position,
                 UserId = entity.UserId,
                 Address = entity.Address,
-                DateOfBirth = entity.DateOfBirth.GetValueOrDefault().ToUniversalTime().ToTimestamp(),
+                DateOfBirth = entity.DateOfBirth.GetValueOrDefault().AddHours(7).ToUniversalTime().ToTimestamp(),
                 Id = entity.Id,
                 DepartmentId = entity.DepartmentId,
             };

@@ -9,17 +9,21 @@ package department;
 service Departmenter {
 	rpc AddDepartment (AddDepartmentRequest) returns (DepartmentReply){
 	option (google.api.http) = {
-      post: "/v1/department/add-department",
+      post: "/v1/department/create",
 	  body: "*"
     };
 	};
 	rpc UpdateDepartment (DepartmentRequest) returns (DepartmentReply){
 	option (google.api.http) = {
-      put: "/v1/department/add-department",
+      put: "/v1/department/update",
 	  body: "department"
     };
 	};
-	rpc DeleteDepartment (DeleteDepartmentRequest) returns (DepartmentReply);
+	rpc DeleteDepartment (DeleteDepartmentRequest) returns (DepartmentReply){
+	option (google.api.http) = {
+      delete: "/v1/department/delete/{id}",
+    };
+	};
 	// Get all department
 	rpc GetAllDepartment (stream Empty) returns (stream GetAllDepartmentReply){
 	};

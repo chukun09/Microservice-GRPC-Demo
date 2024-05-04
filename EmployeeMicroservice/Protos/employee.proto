@@ -9,21 +9,29 @@ package employee;
 service Employeer {
 		rpc AddEmployee (AddEmployeeRequest) returns (EmployeeReply){
 	option (google.api.http) = {
-      post: "/v1/employee/add-employee",
+      post: "/v1/employee/create",
 	  body: "*"
     };
 	};
 	rpc UpdateEmployee (EmployeeRequest) returns (EmployeeReply){
 	option (google.api.http) = {
-      put: "/v1/employee/add-employee",
+      put: "/v1/employee/update",
 	  body: "employee"
     };
 	};
-	rpc DeleteEmployee (DeleteEmployeeRequest) returns (EmployeeReply);
+	rpc DeleteEmployee (DeleteEmployeeRequest) returns (EmployeeReply){
+	option (google.api.http) = {
+      delete: "/v1/employee/delete/{id}",
+    };
+	};
 	// Get all employee
 	rpc GetAllEmployee (stream Empty) returns (stream GetAllEmployeeReply){
 	};
-	rpc GetEmployeeByUserId(GetEmployeeByUserIdRequest) returns (EmployeeMessage);
+	rpc GetEmployeeByUserId(GetEmployeeByUserIdRequest) returns (EmployeeMessage){
+	option (google.api.http) = {
+      get: "/v1/employee/get-by-userId/{userId}",
+    };
+	};
 }
 	message EmployeeRequest {
 	EmployeeMessage employee = 1;

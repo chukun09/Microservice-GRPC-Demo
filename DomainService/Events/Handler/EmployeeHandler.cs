@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static MassTransit.ValidationResultExtensions;
 
 namespace DomainService.Events.Handler
 {
@@ -100,15 +101,19 @@ namespace DomainService.Events.Handler
     public class DeleteUserEmployeeHandler : IRequestHandler<DeleteEmployeeCommand>
     {
         private readonly IEmployeeService _employeeService;
+        protected readonly IMediator _mediator;
 
-        public DeleteUserEmployeeHandler(IEmployeeService employeeService)
+        public DeleteUserEmployeeHandler(IEmployeeService employeeService, IMediator mediator)
         {
             _employeeService = employeeService;
+            _mediator = mediator;
         }
 
         public async Task Handle(DeleteEmployeeCommand request, CancellationToken cancellationToken)
         {
             await _employeeService.DeleteAsync(request.id, cancellationToken);
+            await _mediator.Publish(new DeleteEmployeeNotification(request.id.ToString()), cancellationToken);
+
         }
     }
 }

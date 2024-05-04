@@ -43,6 +43,8 @@ namespace Service.Services.Employee.Employees
             if (employee != null)
             {
                 await _unitOfWork.EmployeeRepository.Delete(employee.Id);
+                var listWorkHoursSummaryEmployee = await _unitOfWork.WorkHoursSummaryRepository.GetAllAsync(x => x.EmployeeId == employee.Id);
+                _unitOfWork.WorkHoursSummaryRepository.DeleteRange(listWorkHoursSummaryEmployee);
                 await _unitOfWork.SaveChangesAsync(ct);
                 return;
             }
