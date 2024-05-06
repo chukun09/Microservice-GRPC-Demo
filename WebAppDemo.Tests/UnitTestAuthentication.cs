@@ -2,7 +2,6 @@
 using DomainService.AuthenticationService.Input;
 using DomainService.Services.AuthenticationService;
 using DomainService.Services.AuthenticationService.Input;
-using Microsoft.AspNetCore.Http;
 
 namespace WebAppDemo.Tests
 {
@@ -14,6 +13,7 @@ namespace WebAppDemo.Tests
         {
             _userService = userService;
         }
+
         [Fact]
         public async Task SignIn_ValidCredentials_ReturnsToken()
         {
@@ -24,7 +24,6 @@ namespace WebAppDemo.Tests
                 Password = "Demo123@@",
                 Username = "demo001"
             };
-
 
             // Act                   
             var result = await _userService.SignInAsync(signInInput);

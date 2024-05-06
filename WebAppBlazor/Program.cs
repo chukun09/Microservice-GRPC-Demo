@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using MudBlazor.Services;
 using System.Net.NetworkInformation;
-using WebAppBlazor.Data;
 using WebAppBlazor.Helper;
 using WebAppBlazor.Pages.Application;
 using WebAppBlazor.Services;
@@ -20,7 +19,6 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
 // Add scoped for service
-builder.Services.AddScoped<WeatherForecastService>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<IAttendanceService, AttendanceService>();

@@ -20,7 +20,7 @@
             </button>
         </li>
         <li class="list-inline-item">
-            <button class="btn btn-sm btn-danger" type="button" @onclick="Delete" disabled="@(!table?.SelectedItems?.Any() ?? true)" data-placement="top" title="Delete">
+            <button class="btn btn-sm btn-danger" type="button" @onclick="Delete" disabled="@(!isSingleSelected)" data-placement="top" title="Delete">
                 <img src="/images/icon-delete.svg" height="16px" /> Delete
             </button>
         </li>

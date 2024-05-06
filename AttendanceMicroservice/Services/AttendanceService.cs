@@ -63,7 +63,7 @@ namespace AttendanceMicroservice.Services
                     var reply = new AttendanceMessage()
                     {
                         Id = entity.Id,
-                        CheckinTime = Timestamp.FromDateTime(entity.CheckinTime),
+                        CheckinTime = Timestamp.FromDateTime(entity.CheckinTime.ToUniversalTime()),
                         CheckoutTime = Timestamp.FromDateTime(entity.CheckoutTime.GetValueOrDefault().ToUniversalTime()),
                         Date = entity.Date.ToDateTime(TimeOnly.MinValue).ToUniversalTime().ToTimestamp(),
                         EmployeeId = entity.EmployeeId,

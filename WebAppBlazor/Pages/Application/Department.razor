@@ -33,7 +33,7 @@
             </button>
         </li>
         <li class="list-inline-item">
-            <button class="btn btn-sm btn-danger" type="button" disabled="@(!table?.SelectedItems?.Any())" @onclick="Delete" data-placement="top" title="Delete">
+            <button class="btn btn-sm btn-danger" type="button" disabled="@(!isSingleSelected)" @onclick="Delete" data-placement="top" title="Delete">
                 <img src="/images/icon-delete.svg" height="16px" /> Delete
             </button>
         </li>
