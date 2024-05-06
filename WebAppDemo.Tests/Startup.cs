@@ -45,11 +45,6 @@ namespace WebAppDemo.Tests
          {
              builder.RegisterModule(new ContainerConfigModule());
          });
-            //    hostBuilder
-            //.ConfigureWebHost(webHostBuilder => webHostBuilder
-            //.UseTestServer(options => options.PreserveExecutionContext = true)
-            //.UseStartup<Startup>());
-
         }
     }
 }
