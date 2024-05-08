@@ -3,23 +3,20 @@ using Core.Helper;
 using Core.Helpers;
 using DomainService.AuthenticationService.Input;
 using DomainService.Services.AuthenticationService;
-using DomainService.UnitOfWorks.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using AutoMapper;
 using Core.Constants;
 using Data;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using DomainService.Services.AuthenticationService.Input;
 using Microsoft.AspNetCore.Http;
-using AutoMapper.Features;
 using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Connections;
+
 
 namespace Service.Services.Authentication
 {
@@ -117,7 +114,8 @@ namespace Service.Services.Authentication
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = _config["JWT:Issuer"],
                     ValidAudience = _config["JWT:Issuer"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_config["JWT:Secret"]))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_config["JWT:Secret"])),
+                    ValidateLifetime = false
                 };
 
                 // This validation function will make sure that the token meets the validation parameters

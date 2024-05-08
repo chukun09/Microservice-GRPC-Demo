@@ -6,6 +6,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<IncludeHttpRuleProtos>true</IncludeHttpRuleProtos>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<!--<PublishAot>true</PublishAot>-->
 	</PropertyGroup>
 
 	<ItemGroup>

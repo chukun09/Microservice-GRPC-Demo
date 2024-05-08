@@ -31,7 +31,7 @@ service WorkHoursSummaryServicer {
 	option (google.api.http) = {
       get: "/v1/work-hours-summary/get-by-employeeId/{employeeId}",
     };
-	};;
+	};
 }
 	message WorkHoursSummaryRequest {
 	WorkHoursSummary workHoursSummary = 1;

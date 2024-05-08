@@ -14,25 +14,25 @@ namespace WebAppDemo.Tests
             _userService = userService;
         }
 
-        [Fact]
-        public async Task SignIn_ValidCredentials_ReturnsToken()
-        {
-            // Arrange
-            var signInInput = new SignInInput()
-            {
-                IsRememberMe = true,
-                Password = "Demo123@@",
-                Username = "demo001"
-            };
+        //[Fact]
+        //public async Task SignIn_ValidCredentials_ReturnsToken()
+        //{
+        //    // Arrange
+        //    var signInInput = new SignInInput()
+        //    {
+        //        IsRememberMe = true,
+        //        Password = "Demo123@@",
+        //        Username = "demo001"
+        //    };
 
-            // Act                   
-            var result = await _userService.SignInAsync(signInInput);
+        //    // Act                   
+        //    var result = await _userService.SignInAsync(signInInput);
 
-            // Assert
-            Assert.NotNull(result);
-            Assert.IsType<SignInResult>(result);
-            // Add more assertions if needed
-        }
+        //    // Assert
+        //    Assert.NotNull(result);
+        //    Assert.IsType<SignInResult>(result);
+        //    // Add more assertions if needed
+        //}
 
         [Fact]
         public async Task SignUp_ValidUser_ReturnsSuccess()

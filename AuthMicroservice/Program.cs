@@ -25,7 +25,7 @@ builder.Services.AddDbContext<AuthenticationDbContext>(options =>
 
     //options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 }
-);
+); 
 
 // For Identity
 builder.Services.AddIdentity<UserEntity, IdentityRole>()
